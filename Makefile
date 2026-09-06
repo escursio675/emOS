@@ -57,6 +57,7 @@ CSTD		?= -std=c99
 # Source files
 
 OBJS += $(SRC_DIR)/main.o
+OBJS += $(SRC_DIR)/systick.o
 OBJS += startup/startup.o
 
 ###############################################################################

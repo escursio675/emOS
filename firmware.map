@@ -17,6 +17,25 @@ Discarded input sections
  .text          0x00000000        0x0 src/main.o
  .data          0x00000000        0x0 src/main.o
  .bss           0x00000000        0x0 src/main.o
+ .group         0x00000000        0xc src/systick.o
+ .group         0x00000000        0xc src/systick.o
+ .group         0x00000000        0xc src/systick.o
+ .group         0x00000000        0xc src/systick.o
+ .group         0x00000000        0xc src/systick.o
+ .group         0x00000000        0xc src/systick.o
+ .group         0x00000000        0xc src/systick.o
+ .text          0x00000000        0x0 src/systick.o
+ .data          0x00000000        0x0 src/systick.o
+ .bss           0x00000000        0x0 src/systick.o
+ .text.uptime_ms
+                0x00000000        0xc src/systick.o
+ .debug_macro   0x00000000      0xacc src/systick.o
+ .debug_macro   0x00000000       0x22 src/systick.o
+ .debug_macro   0x00000000       0x56 src/systick.o
+ .debug_macro   0x00000000       0x51 src/systick.o
+ .debug_macro   0x00000000      0x103 src/systick.o
+ .debug_macro   0x00000000       0x6a src/systick.o
+ .debug_macro   0x00000000      0x1df src/systick.o
  .group         0x00000000        0xc startup/startup.o
  .group         0x00000000        0xc startup/startup.o
  .group         0x00000000        0xc startup/startup.o
@@ -52,6 +71,7 @@ ram              0x20000000         0x00018000         xrw
 Linker script and memory map
 
 LOAD src/main.o
+LOAD src/systick.o
 LOAD startup/startup.o
 START GROUP
 LOAD /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a
@@ -64,153 +84,183 @@ LOAD /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-no
 LOAD /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a
 END GROUP
 
-.text           0x08000000      0x284
+.text           0x08000000      0x2ec
  *(.bootloader_section)
  *(.vectors)
- .vectors       0x08000000        0x8 startup/startup.o
+ .vectors       0x08000000       0x40 startup/startup.o
                 0x08000000                vector_table
-                0x08000010                        . = ALIGN (0x10)
- *fill*         0x08000008        0x8 
+                0x08000040                        . = ALIGN (0x10)
  *(.firmware_info)
  *(.firmware_signature)
  *(.text*)
  .text.startup.main
-                0x08000010       0x4c src/main.o
-                0x08000010                main
+                0x08000040       0x44 src/main.o
+                0x08000040                main
+ .text.systick_init
+                0x08000084       0x14 src/systick.o
+                0x08000084                systick_init
+ .text.systick_handler
+                0x08000098       0x10 src/systick.o
+                0x08000098                systick_handler
+ .text.delay_ms
+                0x080000a8       0x14 src/systick.o
+                0x080000a8                delay_ms
+ .text.default_handler
+                0x080000bc        0x2 startup/startup.o
+                0x080000bc                default_handler
+ .text.nmi_handler
+                0x080000be        0x2 startup/startup.o
+                0x080000be                nmi_handler
+ .text.hardfault_handler
+                0x080000c0        0x2 startup/startup.o
+                0x080000c0                hardfault_handler
+ *fill*         0x080000c2        0x2 
  .text.reset_handler
-                0x0800005c       0x50 startup/startup.o
-                0x0800005c                reset_handler
- .text.memset   0x080000ac       0xa4 /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memset.o)
-                0x080000ac                memset
- .text          0x08000150      0x134 /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memcpy.o)
-                0x08000150                memcpy
-                0x08000284                        . = ALIGN (0x4)
+                0x080000c4       0x50 startup/startup.o
+                0x080000c4                reset_handler
+ .text.memset   0x08000114       0xa4 /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memset.o)
+                0x08000114                memset
+ .text          0x080001b8      0x134 /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memcpy.o)
+                0x080001b8                memcpy
+                0x080002ec                        . = ALIGN (0x4)
  *(.rodata*)
-                0x08000284                        . = ALIGN (0x4)
+                0x080002ec                        . = ALIGN (0x4)
 
-.glue_7         0x08000284        0x0
- .glue_7        0x08000284        0x0 linker stubs
+.glue_7         0x080002ec        0x0
+ .glue_7        0x080002ec        0x0 linker stubs
 
-.glue_7t        0x08000284        0x0
- .glue_7t       0x08000284        0x0 linker stubs
+.glue_7t        0x080002ec        0x0
+ .glue_7t       0x080002ec        0x0 linker stubs
 
-.vfp11_veneer   0x08000284        0x0
- .vfp11_veneer  0x08000284        0x0 linker stubs
+.vfp11_veneer   0x080002ec        0x0
+ .vfp11_veneer  0x080002ec        0x0 linker stubs
 
-.v4_bx          0x08000284        0x0
- .v4_bx         0x08000284        0x0 linker stubs
+.v4_bx          0x080002ec        0x0
+ .v4_bx         0x080002ec        0x0 linker stubs
 
-.iplt           0x08000284        0x0
- .iplt          0x08000284        0x0 startup/startup.o
+.iplt           0x080002ec        0x0
+ .iplt          0x080002ec        0x0 src/main.o
 
-.preinit_array  0x08000284        0x0
-                0x08000284                        . = ALIGN (0x4)
-                0x08000284                        __preinit_array_start = .
+.preinit_array  0x080002ec        0x0
+                0x080002ec                        . = ALIGN (0x4)
+                0x080002ec                        __preinit_array_start = .
  *(.preinit_array)
-                0x08000284                        __preinit_array_end = .
+                0x080002ec                        __preinit_array_end = .
 
-.init_array     0x08000284        0x0
-                0x08000284                        . = ALIGN (0x4)
-                0x08000284                        __init_array_start = .
+.init_array     0x080002ec        0x0
+                0x080002ec                        . = ALIGN (0x4)
+                0x080002ec                        __init_array_start = .
  *(SORT_BY_NAME(.init_array.*))
  *(.init_array)
-                0x08000284                        __init_array_end = .
+                0x080002ec                        __init_array_end = .
 
-.fini_array     0x08000284        0x0
-                0x08000284                        . = ALIGN (0x4)
-                0x08000284                        __fini_array_start = .
+.fini_array     0x080002ec        0x0
+                0x080002ec                        . = ALIGN (0x4)
+                0x080002ec                        __fini_array_start = .
  *(.fini_array)
  *(SORT_BY_NAME(.fini_array.*))
-                0x08000284                        __fini_array_end = .
+                0x080002ec                        __fini_array_end = .
 
 .ARM.extab
  *(.ARM.extab*)
 
-.ARM.exidx      0x08000284        0x8
-                0x08000284                        __exidx_start = .
+.ARM.exidx      0x080002ec        0x8
+                0x080002ec                        __exidx_start = .
  *(.ARM.exidx*)
- .ARM.exidx     0x08000284        0x8 /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memcpy.o)
-                0x0800028c                        __exidx_end = .
+ .ARM.exidx     0x080002ec        0x8 /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memcpy.o)
+                0x080002f4                        __exidx_end = .
 
-.rel.dyn        0x0800028c        0x0
- .rel.iplt      0x0800028c        0x0 startup/startup.o
-                0x0800028c                        . = ALIGN (0x4)
-                0x0800028c                        _etext = .
+.rel.dyn        0x080002f4        0x0
+ .rel.iplt      0x080002f4        0x0 src/main.o
+                0x080002f4                        . = ALIGN (0x4)
+                0x080002f4                        _etext = .
 
 .noinit
  *(.noinit*)
-                0x0800028c                        . = ALIGN (0x4)
+                0x080002f4                        . = ALIGN (0x4)
 
-.data           0x20000000        0x0 load address 0x0800028c
+.data           0x20000000        0x0 load address 0x080002f4
                 0x20000000                        _data = .
  *(.data*)
  *(.ramtext*)
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _edata = .
-                0x0800028c                        _data_loadaddr = LOADADDR (.data)
+                0x080002f4                        _data_loadaddr = LOADADDR (.data)
 
-.igot.plt       0x20000000        0x0 load address 0x0800028c
- .igot.plt      0x20000000        0x0 startup/startup.o
+.igot.plt       0x20000000        0x0 load address 0x080002f4
+ .igot.plt      0x20000000        0x0 src/main.o
 
-.bss            0x20000000        0x0 load address 0x0800028c
+.bss            0x20000000        0x4 load address 0x080002f4
                 0x20000000                        _bss = .
  *(.bss*)
+ .bss.system_ticks
+                0x20000000        0x4 src/systick.o
  *(COMMON)
-                0x20000000                        . = ALIGN (0x4)
-                0x20000000                        _ebss = .
+                0x20000004                        . = ALIGN (0x4)
+                0x20000004                        _ebss = .
 
 /DISCARD/
  *(.eh_frame)
-                0x20000000                        . = ALIGN (0x4)
-                0x20000000                        end = .
+                0x20000004                        . = ALIGN (0x4)
+                0x20000004                        end = .
                 [!provide]                        PROVIDE (_stack = (ORIGIN (ram) + LENGTH (ram)))
 OUTPUT(firmware.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x00000000      0x224
- .debug_info    0x00000000       0xb8 src/main.o
- .debug_info    0x000000b8      0x16c startup/startup.o
+.debug_info     0x00000000      0x3b9
+ .debug_info    0x00000000       0xe6 src/main.o
+ .debug_info    0x000000e6      0x127 src/systick.o
+ .debug_info    0x0000020d      0x1ac startup/startup.o
 
-.debug_abbrev   0x00000000      0x182
- .debug_abbrev  0x00000000       0x75 src/main.o
- .debug_abbrev  0x00000075      0x10d startup/startup.o
+.debug_abbrev   0x00000000      0x2e2
+ .debug_abbrev  0x00000000       0x91 src/main.o
+ .debug_abbrev  0x00000091       0xf4 src/systick.o
+ .debug_abbrev  0x00000185      0x15d startup/startup.o
 
-.debug_aranges  0x00000000       0x40
+.debug_aranges  0x00000000       0x90
  .debug_aranges
                 0x00000000       0x20 src/main.o
  .debug_aranges
-                0x00000020       0x20 startup/startup.o
+                0x00000020       0x38 src/systick.o
+ .debug_aranges
+                0x00000058       0x38 startup/startup.o
 
 .debug_rnglists
-                0x00000000       0x35
+                0x00000000       0x5d
  .debug_rnglists
-                0x00000000       0x22 src/main.o
+                0x00000000       0x13 src/main.o
  .debug_rnglists
-                0x00000022       0x13 startup/startup.o
+                0x00000013       0x25 src/systick.o
+ .debug_rnglists
+                0x00000038       0x25 startup/startup.o
 
-.debug_macro    0x00000000      0xfcb
- .debug_macro   0x00000000       0x81 src/main.o
- .debug_macro   0x00000081      0xacc src/main.o
- .debug_macro   0x00000b4d       0x22 src/main.o
- .debug_macro   0x00000b6f       0x56 src/main.o
- .debug_macro   0x00000bc5       0x51 src/main.o
- .debug_macro   0x00000c16      0x103 src/main.o
- .debug_macro   0x00000d19       0x6a src/main.o
- .debug_macro   0x00000d83      0x1df src/main.o
- .debug_macro   0x00000f62       0x69 startup/startup.o
+.debug_macro    0x00000000     0x106c
+ .debug_macro   0x00000000       0x8b src/main.o
+ .debug_macro   0x0000008b      0xacc src/main.o
+ .debug_macro   0x00000b57       0x22 src/main.o
+ .debug_macro   0x00000b79       0x56 src/main.o
+ .debug_macro   0x00000bcf       0x51 src/main.o
+ .debug_macro   0x00000c20      0x103 src/main.o
+ .debug_macro   0x00000d23       0x6a src/main.o
+ .debug_macro   0x00000d8d      0x1df src/main.o
+ .debug_macro   0x00000f6c       0x97 src/systick.o
+ .debug_macro   0x00001003       0x69 startup/startup.o
 
-.debug_line     0x00000000      0x465
- .debug_line    0x00000000      0x248 src/main.o
- .debug_line    0x00000248      0x21d startup/startup.o
+.debug_line     0x00000000      0x720
+ .debug_line    0x00000000      0x236 src/main.o
+ .debug_line    0x00000236      0x291 src/systick.o
+ .debug_line    0x000004c7      0x259 startup/startup.o
 
-.debug_str      0x00000000     0x3cce
- .debug_str     0x00000000     0x3cce src/main.o
-                               0x3d8d (size before relaxing)
- .debug_str     0x00003cce     0x3d65 startup/startup.o
+.debug_str      0x00000000     0x3e8c
+ .debug_str     0x00000000     0x3e8c src/main.o
+                               0x3dae (size before relaxing)
+ .debug_str     0x00003e8c     0x3e3d src/systick.o
+ .debug_str     0x00003e8c     0x3da3 startup/startup.o
 
 .comment        0x00000000       0x44
  .comment       0x00000000       0x44 src/main.o
                                  0x45 (size before relaxing)
+ .comment       0x00000044       0x45 src/systick.o
  .comment       0x00000044       0x45 startup/startup.o
 
 .ARM.attributes
@@ -218,16 +268,24 @@ LOAD linker stubs
  .ARM.attributes
                 0x00000000       0x34 src/main.o
  .ARM.attributes
-                0x00000034       0x34 startup/startup.o
+                0x00000034       0x34 src/systick.o
  .ARM.attributes
-                0x00000068       0x34 /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memset.o)
+                0x00000068       0x34 startup/startup.o
  .ARM.attributes
-                0x0000009c       0x20 /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memcpy.o)
+                0x0000009c       0x34 /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memset.o)
+ .ARM.attributes
+                0x000000d0       0x20 /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memcpy.o)
 
-.debug_frame    0x00000000       0x78
- .debug_frame   0x00000000       0x24 src/main.o
- .debug_frame   0x00000024       0x28 startup/startup.o
- .debug_frame   0x0000004c       0x2c /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memset.o)
+.debug_frame    0x00000000       0xfc
+ .debug_frame   0x00000000       0x28 src/main.o
+ .debug_frame   0x00000028       0x50 src/systick.o
+ .debug_frame   0x00000078       0x58 startup/startup.o
+ .debug_frame   0x000000d0       0x2c /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memset.o)
+
+.debug_loclists
+                0x00000000       0x34
+ .debug_loclists
+                0x00000000       0x34 src/systick.o
 
 .debug_line_str
                 0x00000000       0xdc
@@ -242,11 +300,21 @@ _data                                             startup/startup.o
 _data_loadaddr                                    startup/startup.o
 _ebss                                             startup/startup.o
 _edata                                            startup/startup.o
+default_handler                                   startup/startup.o
+delay_ms                                          src/systick.o
+                                                  src/main.o
+hardfault_handler                                 startup/startup.o
 main                                              src/main.o
                                                   startup/startup.o
 memcpy                                            /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memcpy.o)
                                                   startup/startup.o
 memset                                            /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a(libc_a-memset.o)
                                                   startup/startup.o
+nmi_handler                                       startup/startup.o
 reset_handler                                     startup/startup.o
+systick_handler                                   src/systick.o
+                                                  startup/startup.o
+systick_init                                      src/systick.o
+                                                  src/main.o
+uptime_ms                                         src/systick.o
 vector_table                                      startup/startup.o
