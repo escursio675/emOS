@@ -1,1 +1,1 @@
-/build
+*.o *.d *.elf *.bin *.hex *.map .DS_Store
