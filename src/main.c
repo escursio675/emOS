@@ -1,23 +1,43 @@
 #include <stdint.h>
 #include "systick.h"
+#include "gpio.h"
 
-#define RCC_BASE     0x40023800U
-#define RCC_AHB1ENR  (*(volatile uint32_t *)(RCC_BASE + 0x30))
+int main(void)
+{
+    gpio_config_t led_config = {
+        .mode  = GPIO_MODE_OUTPUT,
+        .otype = GPIO_OTYPE_PUSH_PULL,
+        .speed = GPIO_SPEED_LOW,
+        .pull  = GPIO_PULL_NONE,
+        .af    = 0
+    };
 
-#define GPIOA_BASE   0x40020000U
-#define GPIOA_MODER  (*(volatile uint32_t *)(GPIOA_BASE + 0x00))
-#define GPIOA_ODR    (*(volatile uint32_t *)(GPIOA_BASE + 0x14))
+    gpio_config_t button_config = {
+        .mode  = GPIO_MODE_INPUT,
+        .otype = GPIO_OTYPE_PUSH_PULL, /* ignored for INPUT mode */
+        .speed = GPIO_SPEED_LOW,       /* ignored for INPUT mode */
+        .pull  = GPIO_PULL_NONE,       /* B1 has an external pull-up on the Nucleo board itself */
+        .af    = 0
+    };
 
-int main(void) {
-    RCC_AHB1ENR |= (1U << 0);
-    GPIOA_MODER &= ~(0x3U << (5 * 2));
-    GPIOA_MODER |=  (0x1U << (5 * 2));
+    /* LD2 on the Nucleo-F401RE is wired to PA5 */
+    gpio_init(GPIOA, 5, &led_config);
 
-    systick_init(16000 - 1);  // 1ms tick @ 16MHz HSI
+    /* B1 user button is wired to PC13 (idle HIGH via external pull-up, LOW when pressed) */
+    gpio_init(GPIOC, 13, &button_config);
+
+    systick_init(16000 - 1);  /* 1ms tick @ 16MHz HSI */
 
     while (1) {
-        GPIOA_ODR ^= (1U << 5);
-        delay_ms(500);
+        if (gpio_read(GPIOC, 13) == GPIO_PIN_LOW) {
+            /* Button pressed (pulled to GND): solid ON */
+            gpio_write(GPIOA, 5, GPIO_PIN_HIGH);
+        } else {
+            /* Button released (pulled HIGH): blink as before */
+            gpio_toggle(GPIOA, 5);
+            delay_ms(500);
+        }
     }
+
     return 0;
 }
