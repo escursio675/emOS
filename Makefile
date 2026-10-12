@@ -18,7 +18,10 @@ BINARY = firmware
 # Basic Device Setup
 
 DEFS				+= -DSTM32F4
+
+# Setup for floating-point performance, utilizing the hardware FPU(Floating Point Unit)
 FP_FLAGS		?= -mfloat-abi=hard -mfpu=fpv4-sp-d16
+
 ARCH_FLAGS	= -mthumb -mcpu=cortex-m4 $(FP_FLAGS)
 
 ###############################################################################
