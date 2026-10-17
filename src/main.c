@@ -2,6 +2,7 @@
 #include "systick.h"
 #include "gpio.h"
 #include "uart.h"
+#include "interrupts.h"
 
 /* Small local string-equality helper -- avoids pulling in <string.h>
  * for a single comparison, matching this project's minimal-dependency
@@ -59,8 +60,13 @@ int main(void)
     uart_init(USART2, 115200, 16000000);
     systick_init(16000 - 1);  /* 1ms tick @ 16MHz HSI */
 
-    uart_puts(USART2, "\r\n--- MiniOS P3 Driver Integration Test ---\r\n");
-    uart_puts(USART2, "Commands: led on | led off | led toggle | button\r\n");
+    /* Initialize EXTI for Blue Button (NVIC Demo) */
+    button_exti_init();
+    irq_enable_global(); /* Ensure interrupts are unmasked */
+
+    uart_puts(USART2, "\r\n--- emOS Core Interrupts Booted ---\r\n");
+    uart_puts(USART2, "Commands: led on | led off | led toggle | stats | fault\r\n");
+    uart_puts(USART2, "Press the Blue Button at any time to trigger an interrupt!\r\n");
 
     while (1) {
         uart_puts(USART2, "\r\n> ");
@@ -76,12 +82,20 @@ int main(void)
         } else if (str_equals(line_buf, "led toggle")) {
             gpio_toggle(GPIOA, 5);
             uart_puts(USART2, "LED toggled\r\n");
-        } else if (str_equals(line_buf, "button")) {
-            if (gpio_read(GPIOC, 13) == GPIO_PIN_LOW) {
-                uart_puts(USART2, "Button is PRESSED\r\n");
-            } else {
-                uart_puts(USART2, "Button is NOT pressed\r\n");
-            }
+        } else if (str_equals(line_buf, "stats")) {
+            /* Basic integer printing to show the interrupt variable changing */
+            uart_puts(USART2, "Button interrupt trigger count: ");
+            char count_str[10];
+            int i = 0;
+            uint32_t temp = button_press_count;
+            if (temp == 0) count_str[i++] = '0';
+            while (temp > 0 && i < 9) { count_str[i++] = (temp % 10) + '0'; temp /= 10; }
+            while (i > 0) uart_putc(USART2, count_str[--i]);
+            uart_puts(USART2, "\r\n");
+        } else if (str_equals(line_buf, "fault")) {
+            uart_puts(USART2, "Simulating HardFault by dereferencing invalid address...\r\n");
+            volatile uint32_t *bad_ptr = (volatile uint32_t *)0xFFFFFFF0;
+            *bad_ptr = 0xDEADBEEF; /* This will instantly trigger a HardFault */
         } else if (line_buf[0] == '\0') {
             /* Empty line (just pressed Enter) -- do nothing, reprint prompt. */
         } else {
