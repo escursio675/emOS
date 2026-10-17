@@ -26,7 +26,7 @@ void exti15_10_irqhandler(void);
 void hardfault_handler(void);
 void default_handler(void);
 
-/* Global state tracked by the button interrupt */
+/* global state tracked by the button interrupt */
 extern volatile uint32_t button_press_count;
 
 #endif /* INTERRUPTS_H */

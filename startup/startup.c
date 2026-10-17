@@ -11,6 +11,7 @@ extern uint32_t _ebss;
 extern int main(void);
 
 /* Handler Declarations */
+
 void reset_handler(void);
 /* a weak default handler. any unhandled interrupt falls here. */
 void default_handler(void) __attribute__((weak));
@@ -19,7 +20,7 @@ void default_handler(void) {
         // trap — unhandled interrupt
     }
 }
-/* Weak Aliases for Core Exceptions */
+/* weak Aliases for Core Exceptions */
 void nmi_handler(void) __attribute__((weak, alias("default_handler")));
 void hardfault_handler(void) __attribute__((weak, alias("default_handler")));
 extern void systick_handler(void); /* implemented in systick.c */

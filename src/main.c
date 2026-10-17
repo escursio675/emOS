@@ -76,14 +76,22 @@ int main(void)
         if (str_equals(line_buf, "led on")) {
             gpio_write(GPIOA, 5, GPIO_PIN_HIGH);
             uart_puts(USART2, "LED turned ON\r\n");
-        } else if (str_equals(line_buf, "led off")) {
+        }
+        
+        else if (str_equals(line_buf, "led off")) {
             gpio_write(GPIOA, 5, GPIO_PIN_LOW);
             uart_puts(USART2, "LED turned OFF\r\n");
-        } else if (str_equals(line_buf, "led toggle")) {
+        }
+        
+        else if (str_equals(line_buf, "led toggle")) {
             gpio_toggle(GPIOA, 5);
             uart_puts(USART2, "LED toggled\r\n");
-        } else if (str_equals(line_buf, "stats")) {
-            /* Basic integer printing to show the interrupt variable changing */
+        }
+        
+        else if (str_equals(line_buf, "stats")) {
+
+            /* basic integer printing to show the interrupt variable changing */
+            
             uart_puts(USART2, "Button interrupt trigger count: ");
             char count_str[10];
             int i = 0;
@@ -92,13 +100,19 @@ int main(void)
             while (temp > 0 && i < 9) { count_str[i++] = (temp % 10) + '0'; temp /= 10; }
             while (i > 0) uart_putc(USART2, count_str[--i]);
             uart_puts(USART2, "\r\n");
-        } else if (str_equals(line_buf, "fault")) {
+        }
+        
+        else if (str_equals(line_buf, "fault")) {
             uart_puts(USART2, "Simulating HardFault by dereferencing invalid address...\r\n");
             volatile uint32_t *bad_ptr = (volatile uint32_t *)0xFFFFFFF0;
             *bad_ptr = 0xDEADBEEF; /* This will instantly trigger a HardFault */
-        } else if (line_buf[0] == '\0') {
+        }
+        
+        else if (line_buf[0] == '\0') {
             /* Empty line (just pressed Enter) -- do nothing, reprint prompt. */
-        } else {
+        }
+        
+        else {
             uart_puts(USART2, "Unknown command. Try: led on / led off / led toggle / button\r\n");
         }
     }
