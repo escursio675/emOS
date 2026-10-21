@@ -90,6 +90,15 @@ void gpio_toggle(GPIO_TypeDef *port, uint8_t pin);
 /** Read the current logic level of a pin (works for input or output pins). */
 gpio_state_t gpio_read(GPIO_TypeDef *port, uint8_t pin);
 
+/** Convenience: configure a pin as a low-speed push-pull output, no pull. */
+void gpio_init_output(GPIO_TypeDef *port, uint8_t pin);
+
+/** Convenience: configure a pin as a floating input (no internal pull). */
+void gpio_init_input(GPIO_TypeDef *port, uint8_t pin);
+
+/** Convenience: configure a pin as a fast push-pull alternate function `af`, no pull. */
+void gpio_init_af(GPIO_TypeDef *port, uint8_t pin, uint8_t af);
+
 #ifdef __cplusplus
 }
 #endif
