@@ -10,18 +10,22 @@ extern uint32_t _bss;
 extern uint32_t _ebss;
 extern int main(void);
 
+/* Handler Declarations */
+
 void reset_handler(void);
-void nmi_handler(void);
-void hardfault_handler(void);
-void systick_handler(void);
-void default_handler(void);
-
-
+/* a weak default handler. any unhandled interrupt falls here. */
+void default_handler(void) __attribute__((weak));
 void default_handler(void) {
     while (1) {
-        // trap — no UART yet to report faults
+        // trap — unhandled interrupt
     }
 }
+/* weak Aliases for Core Exceptions */
+void nmi_handler(void) __attribute__((weak, alias("default_handler")));
+void hardfault_handler(void) __attribute__((weak, alias("default_handler")));
+extern void systick_handler(void); /* implemented in systick.c */
+/* Weak Aliases for Peripheral Interrupts (IRQs) */
+void exti15_10_irqhandler(void) __attribute__((weak, alias("default_handler")));
 
 
 
@@ -42,6 +46,11 @@ void (* const vector_table[])(void) = {
     0,                          // 13: Reserved
     default_handler,            // 14: PendSV
     systick_handler,            // 15: SysTick
+
+    /* External Interrupts (IRQs) start at index 16 */
+    [16 ... 55] = default_handler,  // IRQ 0 to 39 default mapped
+    exti15_10_irqhandler,           // 56: IRQ 40 (EXTI15_10)
+    [57 ... 100] = default_handler  // IRQ 41 to 84 default mapped
 };
 
 void reset_handler(void) {
@@ -64,6 +73,3 @@ void reset_handler(void) {
         // trap if main returns
     }
 }
-
-void nmi_handler(void)       { default_handler(); }
-void hardfault_handler(void) { default_handler(); }
