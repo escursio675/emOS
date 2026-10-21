@@ -62,7 +62,6 @@ OBJS += $(SRC_DIR)/main.o
 OBJS += $(SRC_DIR)/systick.o
 OBJS += $(SRC_DIR)/gpio.o
 OBJS += $(SRC_DIR)/uart.o
-OBJS += $(SRC_DIR)/adc.o
 OBJS += startup/startup.o
 
 ###############################################################################
