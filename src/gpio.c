@@ -67,3 +67,39 @@ gpio_state_t gpio_read(GPIO_TypeDef *port, uint8_t pin)
 {
     return (port->IDR & (1UL << pin)) ? GPIO_PIN_HIGH : GPIO_PIN_LOW;
 }
+
+void gpio_init_output(GPIO_TypeDef *port, uint8_t pin)
+{
+    gpio_config_t cfg = {
+        .mode  = GPIO_MODE_OUTPUT,
+        .otype = GPIO_OTYPE_PUSH_PULL,
+        .speed = GPIO_SPEED_LOW,
+        .pull  = GPIO_PULL_NONE,
+        .af    = 0
+    };
+    gpio_init(port, pin, &cfg);
+}
+
+void gpio_init_input(GPIO_TypeDef *port, uint8_t pin)
+{
+    gpio_config_t cfg = {
+        .mode  = GPIO_MODE_INPUT,
+        .otype = GPIO_OTYPE_PUSH_PULL, /* ignored for INPUT mode */
+        .speed = GPIO_SPEED_LOW,       /* ignored for INPUT mode */
+        .pull  = GPIO_PULL_NONE,
+        .af    = 0
+    };
+    gpio_init(port, pin, &cfg);
+}
+
+void gpio_init_af(GPIO_TypeDef *port, uint8_t pin, uint8_t af)
+{
+    gpio_config_t cfg = {
+        .mode  = GPIO_MODE_AF,
+        .otype = GPIO_OTYPE_PUSH_PULL,
+        .speed = GPIO_SPEED_FAST,
+        .pull  = GPIO_PULL_NONE,
+        .af    = af
+    };
+    gpio_init(port, pin, &cfg);
+}

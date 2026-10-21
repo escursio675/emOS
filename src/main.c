@@ -22,39 +22,15 @@ int main(void)
 {
     char line_buf[64];
 
-    gpio_config_t led_config = {
-        .mode  = GPIO_MODE_OUTPUT,
-        .otype = GPIO_OTYPE_PUSH_PULL,
-        .speed = GPIO_SPEED_LOW,
-        .pull  = GPIO_PULL_NONE,
-        .af    = 0
-    };
-
-    gpio_config_t button_config = {
-        .mode  = GPIO_MODE_INPUT,
-        .otype = GPIO_OTYPE_PUSH_PULL, /* ignored for INPUT mode */
-        .speed = GPIO_SPEED_LOW,       /* ignored for INPUT mode */
-        .pull  = GPIO_PULL_NONE,       /* B1 has an external pull-up on the Nucleo board itself */
-        .af    = 0
-    };
-
-    gpio_config_t usart2_pin_config = {
-        .mode  = GPIO_MODE_AF,
-        .otype = GPIO_OTYPE_PUSH_PULL,
-        .speed = GPIO_SPEED_FAST,
-        .pull  = GPIO_PULL_NONE,
-        .af    = 7
-    };
-
     /* LD2 on the Nucleo-F401RE is wired to PA5 */
-    gpio_init(GPIOA, 5, &led_config);
+    gpio_init_output(GPIOA, 5);
 
     /* B1 user button is wired to PC13 (idle HIGH via external pull-up, LOW when pressed) */
-    gpio_init(GPIOC, 13, &button_config);
+    gpio_init_input(GPIOC, 13);
 
     /* USART2 TX/RX pins: PA2 = TX, PA3 = RX, both use AF7 */
-    gpio_init(GPIOA, 2, &usart2_pin_config);
-    gpio_init(GPIOA, 3, &usart2_pin_config);
+    gpio_init_af(GPIOA, 2, 7);
+    gpio_init_af(GPIOA, 3, 7);
 
     uart_init(USART2, 115200, 16000000);
     systick_init(16000 - 1);  /* 1ms tick @ 16MHz HSI */
