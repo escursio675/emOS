@@ -79,9 +79,8 @@ int main(void)
         }
 
         else if (str_equals(line_buf, "fault")) {
-            uart_puts(USART2, "Simulating HardFault by dereferencing invalid address...\r\n");
-            volatile uint32_t *bad_ptr = (volatile uint32_t *)0xFFFFFFF0;
-            *bad_ptr = 0xDEADBEEF; /* This will instantly trigger a HardFault */
+            uart_puts(USART2, "Simulating HardFault via undefined instruction.....\r\n");
+            __asm volatile("udf #0");   /* UsageFault -> escalates to HardFault */
         }
 
         else if (line_buf[0] == '\0') {
