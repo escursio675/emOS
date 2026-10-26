@@ -88,7 +88,7 @@ int main(void)
         }
 
         else {
-            uart_puts(USART2, "Unknown command. Try: led on / led off / led toggle / button\r\n");
+            uart_puts(USART2, "Unknown command. Try: led on | led off | led toggle | stats | fault\r\n");
         }
     }
 
