@@ -2,6 +2,7 @@
 #include "systick.h"
 #include "gpio.h"
 #include "uart.h"
+#include "interrupts.h"
 
 /* Small local string-equality helper -- avoids pulling in <string.h>
  * for a single comparison, matching this project's minimal-dependency
@@ -35,8 +36,13 @@ int main(void)
     uart_init(USART2, 115200, 16000000);
     systick_init(16000 - 1);  /* 1ms tick @ 16MHz HSI */
 
-    uart_puts(USART2, "\r\n--- MiniOS P3 Driver Integration Test ---\r\n");
-    uart_puts(USART2, "Commands: led on | led off | led toggle | button\r\n");
+    /* Initialize EXTI for Blue Button (NVIC Demo) */
+    button_exti_init();
+    irq_enable_global(); /* Ensure interrupts are unmasked */
+
+    uart_puts(USART2, "\r\n--- emOS Core Interrupts Booted ---\r\n");
+    uart_puts(USART2, "Commands: led on | led off | led toggle | stats | fault\r\n");
+    uart_puts(USART2, "Press the Blue Button at any time to trigger an interrupt!\r\n");
 
     while (1) {
         uart_puts(USART2, "\r\n> ");
@@ -46,22 +52,43 @@ int main(void)
         if (str_equals(line_buf, "led on")) {
             gpio_write(GPIOA, 5, GPIO_PIN_HIGH);
             uart_puts(USART2, "LED turned ON\r\n");
-        } else if (str_equals(line_buf, "led off")) {
+        }
+
+        else if (str_equals(line_buf, "led off")) {
             gpio_write(GPIOA, 5, GPIO_PIN_LOW);
             uart_puts(USART2, "LED turned OFF\r\n");
-        } else if (str_equals(line_buf, "led toggle")) {
+        }
+
+        else if (str_equals(line_buf, "led toggle")) {
             gpio_toggle(GPIOA, 5);
             uart_puts(USART2, "LED toggled\r\n");
-        } else if (str_equals(line_buf, "button")) {
-            if (gpio_read(GPIOC, 13) == GPIO_PIN_LOW) {
-                uart_puts(USART2, "Button is PRESSED\r\n");
-            } else {
-                uart_puts(USART2, "Button is NOT pressed\r\n");
-            }
-        } else if (line_buf[0] == '\0') {
+        }
+
+        else if (str_equals(line_buf, "stats")) {
+
+            /* basic integer printing to show the interrupt variable changing */
+
+            uart_puts(USART2, "Button interrupt trigger count: ");
+            char count_str[10];
+            int i = 0;
+            uint32_t temp = button_press_count;
+            if (temp == 0) count_str[i++] = '0';
+            while (temp > 0 && i < 9) { count_str[i++] = (temp % 10) + '0'; temp /= 10; }
+            while (i > 0) uart_putc(USART2, count_str[--i]);
+            uart_puts(USART2, "\r\n");
+        }
+
+        else if (str_equals(line_buf, "fault")) {
+            uart_puts(USART2, "Simulating HardFault via undefined instruction.....\r\n");
+            __asm volatile("udf #0");   /* UsageFault -> escalates to HardFault */
+        }
+
+        else if (line_buf[0] == '\0') {
             /* Empty line (just pressed Enter) -- do nothing, reprint prompt. */
-        } else {
-            uart_puts(USART2, "Unknown command. Try: led on / led off / led toggle / button\r\n");
+        }
+
+        else {
+            uart_puts(USART2, "Unknown command. Try: led on | led off | led toggle | stats | fault\r\n");
         }
     }
 
