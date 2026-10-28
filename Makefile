@@ -65,6 +65,8 @@ OBJS += $(SRC_DIR)/uart.o
 OBJS += $(SRC_DIR)/interrupts.o
 #OBJS += $(SRC_DIR)/adc.o      uncomment when ADC is implemented
 OBJS += startup/startup.o
+OBJS += $(SRC_DIR)/memory.o
+OBJS += $(SRC_DIR)/hexdump.o
 
 ###############################################################################
 # C flags
