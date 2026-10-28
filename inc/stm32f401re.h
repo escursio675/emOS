@@ -39,6 +39,13 @@
 #define ADC1_BASE             (APB2PERIPH_BASE + 0x2000UL)
 #define ADC_COMMON_BASE       (APB2PERIPH_BASE + 0x2300UL)
 
+#define SYSCFG_BASE         (APB2PERIPH_BASE + 0x3800UL)
+#define EXTI_BASE           (APB2PERIPH_BASE + 0x3C00UL)
+
+#define SCS_BASE            (0xE000E000UL)
+#define NVIC_BASE           (SCS_BASE + 0x0100UL)
+#define SCB_BASE            (SCS_BASE + 0x0D00UL)
+
 /* ------------------------------------------------------------------- */
 /* RCC                                                                   */
 /* ------------------------------------------------------------------- */
@@ -75,6 +82,7 @@ typedef struct {
 #define RCC_APB2ENR_USART1EN  (1UL << 4)
 #define RCC_APB2ENR_USART6EN  (1UL << 5)
 #define RCC_APB2ENR_ADC1EN    (1UL << 8)
+#define RCC_APB2ENR_SYSCFGEN  (1UL << 14)
 
 /* ------------------------------------------------------------------- */
 /* GPIO                                                                  */
@@ -152,5 +160,61 @@ typedef struct {
 #define ADC_SR_EOC     (1UL << 1)
 #define ADC_CR2_ADON   (1UL << 0)
 #define ADC_CR2_SWSTART (1UL << 30)
+
+/* ------------------------------------------------------------------- */
+/* INTERRUPTS: SYSCFG, EXTI, NVIC, SCB                                 */
+/* ------------------------------------------------------------------- */
+
+typedef struct {
+    volatile uint32_t MEMRMP;
+    volatile uint32_t PMC;
+    volatile uint32_t EXTICR[4];
+    volatile uint32_t CMPCR;
+} SYSCFG_TypeDef;
+
+typedef struct {
+    volatile uint32_t IMR;
+    volatile uint32_t EMR;
+    volatile uint32_t RTSR;
+    volatile uint32_t FTSR;
+    volatile uint32_t SWIER;
+    volatile uint32_t PR;
+} EXTI_TypeDef;
+
+typedef struct {
+    volatile uint32_t ISER[8];
+    uint32_t RESERVED0[24];
+    volatile uint32_t ICER[8];
+    uint32_t RSERVED1[24];
+    volatile uint32_t ISPR[8];
+    uint32_t RESERVED2[24];
+    volatile uint32_t ICPR[8];
+    uint32_t RESERVED3[24];
+    volatile uint32_t IABR[8];
+    uint32_t RESERVED4[56];
+    volatile uint8_t  IP[240];
+} NVIC_TypeDef;
+
+typedef struct {
+    volatile uint32_t CPUID;
+    volatile uint32_t ICSR;
+    volatile uint32_t VTOR;
+    volatile uint32_t AIRCR;
+    volatile uint32_t SCR;
+    volatile uint32_t CCR;
+    volatile uint8_t  SHP[12];
+    volatile uint32_t SHCSR;
+    volatile uint32_t CFSR;
+    volatile uint32_t HFSR;
+    volatile uint32_t DFSR;
+    volatile uint32_t MMFAR;
+    volatile uint32_t BFAR;
+    volatile uint32_t AFSR;
+} SCB_TypeDef;
+
+#define SYSCFG ((SYSCFG_TypeDef *)SYSCFG_BASE)
+#define EXTI   ((EXTI_TypeDef *)EXTI_BASE)
+#define NVIC   ((NVIC_TypeDef *)NVIC_BASE)
+#define SCB    ((SCB_TypeDef *)SCB_BASE)
 
 #endif /* STM32F401RE_H */
