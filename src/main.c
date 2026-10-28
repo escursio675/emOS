@@ -122,7 +122,7 @@ int main(void)
     irq_enable_global(); /* Ensure interrupts are unmasked */
 
     uart_puts(USART2, "\r\n--- emOS Core Interrupts Booted ---\r\n");
-    uart_puts(USART2, "Commands: led on | led off | led toggle | stats | fault\r\n");
+    uart_puts(USART2, "Commands:  led on | led off | led toggle | stats | fault | mem | memtest\r\n");
     uart_puts(USART2, "Press the Blue Button at any time to trigger an interrupt!\r\n");
 
     while (1) {
