@@ -3,6 +3,7 @@
 #include "systick.h"
 #include "gpio.h"
 #include "uart.h"
+#include "adc.h"
 #include "../inc/memory.h"
 #include "interrupts.h"
 
@@ -99,6 +100,38 @@ static void cmd_memtest(void)
     cmd_mem();
 }
 
+/* adc: one conversion on A0 (PA0 = ADC1 channel 0), shown as raw count and millivolts */
+static void cmd_adc(void)
+{
+    uint16_t raw = adc_read(ADC_CHANNEL_0);
+
+    if (raw == ADC_READ_ERROR) {
+        say("ADC read failed: no end-of-conversion\r\n");
+        return;
+    }
+
+    say("ADC A0 (PA0): raw "); say_uint(raw);
+    say(" of 4095, ");         say_uint(adc_to_millivolts(raw));
+    say(" mV\r\n");
+}
+
+/* adc vref: reads the chip's internal 1.21 V reference and estimates VDDA from it.
+ * Needs no wiring, so it checks the whole conversion path on its own. */
+static void cmd_adc_vref(void)
+{
+    uint16_t raw = adc_read(ADC_CHANNEL_VREFINT);
+
+    if (raw == ADC_READ_ERROR) {
+        say("ADC read failed: no end-of-conversion\r\n");
+        return;
+    }
+
+    say("VREFINT raw "); say_uint(raw);
+    say(" of 4095, estimated VDDA "); say_uint(adc_estimate_vdda_mv(raw));
+    say(" mV\r\n");
+    say("(expected: raw about 1450-1550, VDDA about 3200-3400 mV)\r\n");
+}
+
 int main(void)
 {
     char line_buf[64];
@@ -113,16 +146,20 @@ int main(void)
     gpio_init_af(GPIOA, 2, 7);
     gpio_init_af(GPIOA, 3, 7);
 
+    /* PA0 (Arduino A0) as an analog input for ADC1 channel 0 */
+    gpio_init_analog(GPIOA, 0);
+
     uart_init(USART2, 115200, 16000000);
     systick_init(16000 - 1);  /* 1ms tick @ 16MHz HSI */
     kmalloc_init();
+    adc_init();
 
     /* Initialize EXTI for Blue Button (NVIC Demo) */
     button_exti_init();
     irq_enable_global(); /* Ensure interrupts are unmasked */
 
     uart_puts(USART2, "\r\n--- emOS Core Interrupts Booted ---\r\n");
-    uart_puts(USART2, "Commands:  led on | led off | led toggle | button | stats | fault | mem | memtest\r\n");
+    uart_puts(USART2, "Commands:  led on | led off | led toggle | button | adc | adc vref | stats | fault | mem | memtest\r\n");
     uart_puts(USART2, "Press the Blue Button at any time to trigger an interrupt!\r\n");
 
     while (1) {
@@ -153,6 +190,10 @@ int main(void)
             cmd_mem();
         } else if (str_equals(line_buf, "memtest")) {
             cmd_memtest();
+        } else if (str_equals(line_buf, "adc")) {
+            cmd_adc();
+        } else if (str_equals(line_buf, "adc vref")) {
+            cmd_adc_vref();
         } else if (line_buf[0] == '\0') {
             /* Empty line (just pressed Enter) -- do nothing, reprint prompt. */
         } 
@@ -176,7 +217,7 @@ int main(void)
         }
 
         else {
-            uart_puts(USART2, "Unknown command. Try: led on | led off | led toggle | button | stats | fault | mem | memtest\r\n");
+            uart_puts(USART2, "Unknown command. Try: led on | led off | led toggle | button | adc | adc vref | stats | fault | mem | memtest\r\n");
         }
     }
 
