@@ -122,7 +122,7 @@ int main(void)
     irq_enable_global(); /* Ensure interrupts are unmasked */
 
     uart_puts(USART2, "\r\n--- emOS Core Interrupts Booted ---\r\n");
-    uart_puts(USART2, "Commands:  led on | led off | led toggle | stats | fault | mem | memtest\r\n");
+    uart_puts(USART2, "Commands:  led on | led off | led toggle | button | stats | fault | mem | memtest\r\n");
     uart_puts(USART2, "Press the Blue Button at any time to trigger an interrupt!\r\n");
 
     while (1) {
@@ -175,12 +175,8 @@ int main(void)
             __asm volatile("udf #0");   /* UsageFault -> escalates to HardFault */
         }
 
-        else if (line_buf[0] == '\0') {
-            /* Empty line (just pressed Enter) -- do nothing, reprint prompt. */
-        }
-
         else {
-            uart_puts(USART2, "Unknown command. Try: led on | led off | led toggle | stats | fault | mem | memtest\r\n");
+            uart_puts(USART2, "Unknown command. Try: led on | led off | led toggle | button | stats | fault | mem | memtest\r\n");
         }
     }
 
