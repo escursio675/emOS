@@ -4,6 +4,7 @@
 #include "gpio.h"
 #include "uart.h"
 #include "adc.h"
+#include "selftest.h"
 #include "../inc/memory.h"
 #include "interrupts.h"
 
@@ -159,7 +160,7 @@ int main(void)
     irq_enable_global(); /* Ensure interrupts are unmasked */
 
     uart_puts(USART2, "\r\n--- emOS Core Interrupts Booted ---\r\n");
-    uart_puts(USART2, "Commands:  led on | led off | led toggle | button | adc | adc vref | stats | fault | mem | memtest\r\n");
+    uart_puts(USART2, "Commands:  led on | led off | led toggle | button | adc | adc vref | gpio test | uart test | stats | fault | mem | memtest\r\n");
     uart_puts(USART2, "Press the Blue Button at any time to trigger an interrupt!\r\n");
 
     while (1) {
@@ -194,6 +195,10 @@ int main(void)
             cmd_adc();
         } else if (str_equals(line_buf, "adc vref")) {
             cmd_adc_vref();
+        } else if (str_equals(line_buf, "gpio test")) {
+            selftest_gpio();
+        } else if (str_equals(line_buf, "uart test")) {
+            selftest_uart();
         } else if (line_buf[0] == '\0') {
             /* Empty line (just pressed Enter) -- do nothing, reprint prompt. */
         } 
@@ -217,7 +222,7 @@ int main(void)
         }
 
         else {
-            uart_puts(USART2, "Unknown command. Try: led on | led off | led toggle | button | adc | adc vref | stats | fault | mem | memtest\r\n");
+            uart_puts(USART2, "Unknown command. Try: led on | led off | led toggle | button | adc | adc vref | gpio test | uart test | stats | fault | mem | memtest\r\n");
         }
     }
 
