@@ -31,9 +31,8 @@ extern "C" {
  * `pclk_hz` to compute the BRR divisor.
  *
  * Does NOT configure the associated GPIO pins into AF mode -- call
- * gpio_init() with GPIO_MODE_AF (and the correct AF number for the
- * chosen USART) before or after this, per the pinout the team settles
- * on.
+ * gpio_init_af() (alternate function 7 for USART2 on PA2/PA3) before or
+ * after this.
  */
 void uart_init(USART_TypeDef *usart, uint32_t baudrate, uint32_t pclk_hz);
 
@@ -58,6 +57,20 @@ int uart_data_available(USART_TypeDef *usart);
  * Returns the number of characters read (excluding the NUL terminator).
  */
 uint32_t uart_read_line(USART_TypeDef *usart, char *buf, uint32_t maxlen);
+
+/** Receive error counts since start-up or the last uart_clear_errors(). */
+typedef struct {
+    uint32_t overrun;   /* a byte arrived before the previous one was read, so it was lost */
+    uint32_t noise;     /* noise was detected on the line while a byte was received */
+    uint32_t framing;   /* a byte arrived without a valid stop bit */
+    uint32_t parity;    /* parity check failed (always 0 in 8N1) */
+} uart_errors_t;
+
+/** Copy the error counters of `usart` into `out`. uart_getc() updates them. */
+void uart_get_errors(USART_TypeDef *usart, uart_errors_t *out);
+
+/** Reset the error counters of `usart` to zero. */
+void uart_clear_errors(USART_TypeDef *usart);
 
 #ifdef __cplusplus
 }

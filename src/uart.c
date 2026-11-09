@@ -5,10 +5,42 @@
  * Owner: P3 - Hardware Drivers
  *
  * Status: uart_init(), TX (putc/puts/write), RX (getc/data_available),
- * and uart_read_line() all implemented and tested.
+ * uart_read_line() and receive-error counting are implemented and tested.
  */
 
 #include "uart.h"
+
+/* Status register error flags. The shared register header only defines the
+ * TXE, TC and RXNE bits, so these four are defined here. */
+#ifndef USART_SR_PE
+#define USART_SR_PE    (1UL << 0)
+#endif
+#ifndef USART_SR_FE
+#define USART_SR_FE    (1UL << 1)
+#endif
+#ifndef USART_SR_NE
+#define USART_SR_NE    (1UL << 2)
+#endif
+#ifndef USART_SR_ORE
+#define USART_SR_ORE   (1UL << 3)
+#endif
+
+/* One set of error counters per USART: USART1, USART2 and USART6. */
+static uart_errors_t s_errors[3];
+
+static uart_errors_t *errors_for(USART_TypeDef *usart)
+{
+    if (usart == USART1) {
+        return &s_errors[0];
+    }
+    if (usart == USART2) {
+        return &s_errors[1];
+    }
+    if (usart == USART6) {
+        return &s_errors[2];
+    }
+    return NULL;
+}
 
 void uart_init(USART_TypeDef *usart, uint32_t baudrate, uint32_t pclk_hz)
 {
@@ -35,7 +67,31 @@ void uart_putc(USART_TypeDef *usart, char c)
 
 char uart_getc(USART_TypeDef *usart)
 {
-    while (!(usart->SR & USART_SR_RXNE)) { }
+    uint32_t sr = usart->SR;
+    uart_errors_t *e;
+
+    while (!(sr & USART_SR_RXNE)) {
+        sr = usart->SR;
+    }
+
+    /* The error flags in this status read belong to the byte about to be
+     * read. Reading SR and then DR also clears the flags in hardware. */
+    e = errors_for(usart);
+    if (e != NULL) {
+        if (sr & USART_SR_ORE) {
+            e->overrun++;
+        }
+        if (sr & USART_SR_NE) {
+            e->noise++;
+        }
+        if (sr & USART_SR_FE) {
+            e->framing++;
+        }
+        if (sr & USART_SR_PE) {
+            e->parity++;
+        }
+    }
+
     return (char)(usart->DR & 0xFF);
 }
 
@@ -101,4 +157,40 @@ uint32_t uart_read_line(USART_TypeDef *usart, char *buf, uint32_t maxlen)
 
     buf[count] = '\0';
     return count;
+}
+
+void uart_get_errors(USART_TypeDef *usart, uart_errors_t *out)
+{
+    uart_errors_t *e = errors_for(usart);
+
+    if (out == NULL) {
+        return;
+    }
+
+    if (e == NULL) {
+        out->overrun = 0U;
+        out->noise   = 0U;
+        out->framing = 0U;
+        out->parity  = 0U;
+        return;
+    }
+
+    out->overrun = e->overrun;
+    out->noise   = e->noise;
+    out->framing = e->framing;
+    out->parity  = e->parity;
+}
+
+void uart_clear_errors(USART_TypeDef *usart)
+{
+    uart_errors_t *e = errors_for(usart);
+
+    if (e == NULL) {
+        return;
+    }
+
+    e->overrun = 0U;
+    e->noise   = 0U;
+    e->framing = 0U;
+    e->parity  = 0U;
 }

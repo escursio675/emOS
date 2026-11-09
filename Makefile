@@ -64,6 +64,7 @@ OBJS += $(SRC_DIR)/gpio.o
 OBJS += $(SRC_DIR)/uart.o
 OBJS += $(SRC_DIR)/interrupts.o
 OBJS += $(SRC_DIR)/adc.o
+OBJS += $(SRC_DIR)/selftest.o
 OBJS += startup/startup.o
 OBJS += $(SRC_DIR)/memory.o
 OBJS += $(SRC_DIR)/hexdump.o
