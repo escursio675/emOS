@@ -2,7 +2,7 @@
 
 # P3: Hardware Drivers (GPIO, UART, ADC)
 
-P3 owns the hardware drivers of MiniOS. GPIO, UART and ADC are all written and have run on a Nucleo-F401RE board. One check is still pending: reading a known external voltage on A0 with the ADC, which needs a jumper wire.
+P3 owns the hardware drivers of MiniOS. GPIO, UART and ADC are all written and verified on a Nucleo-F401RE board.
 
 ## Status
 
@@ -10,7 +10,7 @@ P3 owns the hardware drivers of MiniOS. GPIO, UART and ADC are all written and h
 | --- | --- | --- | --- |
 | GPIO | `inc/gpio.h`, `src/gpio.c` | Done, merged into `main` | LED blink, button read, shell commands |
 | UART (USART2) | `inc/uart.h`, `src/uart.c` | Done, merged into `main` | Transmit, receive, line read, shell prompt |
-| ADC (ADC1) | `inc/adc.h`, `src/adc.c` | Done, on branch `p3-adc-driver` | Internal 1.21 V reference reads correctly. External pin test pending |
+| ADC (ADC1) | `inc/adc.h`, `src/adc.c` | Done, on branch `p3-adc-driver` | Internal 1.21 V reference, and A0 wired to GND and to 3V3 (see Testing) |
 
 All three drivers use the register map in `inc/stm32f401re.h`. There is no HAL and no floating point (the FPU is not enabled at startup).
 
@@ -85,14 +85,14 @@ After flashing, open the terminal and press the black RESET button. The banner a
 2. `button` with B1 untouched prints `Button is NOT pressed`. Hold B1 and run it again to get `Button is PRESSED`.
 3. `adc vref` should print a raw value of about 1500 and an estimated VDDA of about 3300 mV. On our board it reads raw 1497 to 1499 and VDDA 3306 to 3310 mV. Anything from roughly 1450 to 1550 raw is normal, because the reference may be anywhere from 1.18 V to 1.24 V.
 
-**Pending ADC check (needs a jumper wire).** Run `adc` while A0 is wired to GND, then wired to the 3V3 socket:
+**ADC check with a jumper wire (done).** Run `adc` several times while A0 is wired to GND, then wired to the 3V3 socket. Readings from our board on 9 Nov 2026, five each:
 
-| A0 connected to | Expected `adc` output |
-| --- | --- |
-| GND | raw near 0, near 0 mV |
-| 3V3 | raw near 4095, near 3300 mV |
+| A0 connected to | Expected `adc` output | Measured on our board |
+| --- | --- | --- |
+| GND | raw near 0, near 0 mV | raw 0 to 2 (0 to 2 mV) |
+| 3V3 | raw near 4095, near 3300 mV | raw 4091 to 4095 (3297 to 3300 mV) |
 
-Never connect A0 to the 5V socket. The ADC pin tolerates 3.3 V only.
+Repeat it after any change to the ADC code. Unplug the USB cable before moving the wire, and never connect A0 to the 5V socket. The ADC pin tolerates 3.3 V only.
 
 ## Design notes
 
@@ -107,6 +107,7 @@ Never connect A0 to the 5V socket. The ADC pin tolerates 3.3 V only.
 - All driver calls are polling and blocking. Interrupt-driven UART receive with a ring buffer and DMA are not implemented.
 - Only USART2 and GPIO ports A and C have been run on the board.
 - `uart_write` has not been run on the board yet.
+- The ADC has been checked on external channel 0 (A0) and on the internal reference (channel 17). The other external channels use the same code but have not been run, and no mid-scale external voltage has been tested.
 - The UART driver does not handle receive overrun or framing errors, and the data register holds one byte, so text pasted quickly can lose characters.
 - The ADC reads one channel at a time, and results depend on VDDA being close to 3.3 V.
 
