@@ -99,6 +99,9 @@ void gpio_init_input(GPIO_TypeDef *port, uint8_t pin);
 /** Convenience: configure a pin as a fast push-pull alternate function `af`, no pull. */
 void gpio_init_af(GPIO_TypeDef *port, uint8_t pin, uint8_t af);
 
+/** Convenience: configure a pin as an analog input (used by the ADC), no pull. */
+void gpio_init_analog(GPIO_TypeDef *port, uint8_t pin);
+
 #ifdef __cplusplus
 }
 #endif
