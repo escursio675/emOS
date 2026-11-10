@@ -68,9 +68,22 @@ OBJS += $(SRC_DIR)/selftest.o
 OBJS += startup/startup.o
 OBJS += $(SRC_DIR)/memory.o
 OBJS += $(SRC_DIR)/hexdump.o
+
+# --- Shell modules (Phase 1) ---
 OBJS += $(SRC_DIR)/shell/strutil.o
 OBJS += $(SRC_DIR)/shell/keyfilter.o
 OBJS += $(SRC_DIR)/shell/console.o
+
+# --- Shell core (Phase 2) ---
+OBJS += $(SRC_DIR)/shell/shell.o
+OBJS += $(SRC_DIR)/shell/cmd_table.o
+
+# --- Command handlers (Phase 2) ---
+OBJS += $(SRC_DIR)/commands/cmd_led.o
+OBJS += $(SRC_DIR)/commands/cmd_system.o
+OBJS += $(SRC_DIR)/commands/cmd_adc.o
+OBJS += $(SRC_DIR)/commands/cmd_mem.o
+OBJS += $(SRC_DIR)/commands/cmd_selftest.o
 
 ###############################################################################
 # C flags
