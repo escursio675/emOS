@@ -9,29 +9,12 @@
 #include "gpio.h"
 #include "uart.h"
 #include "systick.h"
+#include "shell/console.h"
 
 #define ST_PORT  GPIOB
 #define ST_PIN   0U      /* PB0 = Arduino A3, left unconnected for the test */
 
-static void say(const char *s)
-{
-    uart_puts(USART2, s);
-}
 
-static void say_uint(uint32_t v)
-{
-    char buf[11];            /* 10 digits + NUL */
-    uint32_t i = 10U;
-
-    buf[i] = '\0';
-    do {
-        i--;
-        buf[i] = (char)('0' + (v % 10U));
-        v /= 10U;
-    } while (v != 0U);
-
-    say(&buf[i]);
-}
 
 /* ------------------------------------------------------------------ GPIO */
 
@@ -78,9 +61,9 @@ static gpio_state_t gpio_probe(const gpio_case_t *c)
 /* Print one result line and return 1 for a pass, 0 for a fail. */
 static uint32_t gpio_report(const char *label, gpio_state_t got, gpio_state_t want)
 {
-    say("  "); say(label); say(": ");
-    say(got == GPIO_PIN_HIGH ? "HIGH" : "LOW");
-    say(got == want ? "  PASS\r\n" : "  FAIL\r\n");
+    console_puts("  "); console_puts(label); console_puts(": ");
+    console_puts(got == GPIO_PIN_HIGH ? "HIGH" : "LOW");
+    console_puts(got == want ? "  PASS\r\n" : "  FAIL\r\n");
     return (got == want) ? 1U : 0U;
 }
 
@@ -94,7 +77,7 @@ void selftest_gpio(void)
     uint32_t total = 0U;
     uint32_t i;
 
-    say("GPIO self-test on PB0 (Arduino A3). Nothing may be plugged into A3.\r\n");
+    console_puts("GPIO self-test on PB0 (Arduino A3). Nothing may be plugged into A3.\r\n");
 
     for (i = 0U; i < (sizeof(gpio_cases) / sizeof(gpio_cases[0])); i++) {
         pass += gpio_report(gpio_cases[i].label, gpio_probe(&gpio_cases[i]), gpio_cases[i].expect);
@@ -114,8 +97,8 @@ void selftest_gpio(void)
 
     (void)gpio_probe(&restore);     /* leave PB0 as a floating input */
 
-    say(pass == total ? "Result: ALL PASS (" : "Result: FAILED (");
-    say_uint(pass); say(" of "); say_uint(total); say(" checks passed)\r\n");
+    console_puts(pass == total ? "Result: ALL PASS (" : "Result: FAILED (");
+    console_put_uint(pass); console_puts(" of "); console_put_uint(total); console_puts(" checks passed)\r\n");
 }
 
 /* ------------------------------------------------------------------ UART */
@@ -126,15 +109,15 @@ void selftest_uart(void)
     uart_errors_t e;
     uint32_t start;
 
-    say("UART self-test (3 stages)\r\n");
+    console_puts("UART self-test (3 stages)\r\n");
 
     /* Stage 1: uart_write must send exactly the number of bytes asked for. */
-    say("1) uart_write. The next line should show exactly MiniOS and nothing after it:\r\n   ");
+    console_puts("1) uart_write. The next line should show exactly MiniOS and nothing after it:\r\n   ");
     uart_write(USART2, msg, 6U);
-    say("\r\n");
+    console_puts("\r\n");
 
     /* Stage 2: uart_data_available must not block, and uart_getc must return the key. */
-    say("2) uart_data_available. Press any key within 5 seconds...\r\n");
+    console_puts("2) uart_data_available. Press any key within 5 seconds...\r\n");
     delay_ms(50);
     while (uart_data_available(USART2)) {
         (void)uart_getc(USART2);        /* drop anything left over from typing the command */
@@ -144,26 +127,26 @@ void selftest_uart(void)
         delay_ms(10);
     }
     if (uart_data_available(USART2)) {
-        say("   key received, code ");
-        say_uint((uint32_t)(uint8_t)uart_getc(USART2));
-        say(": PASS\r\n");
+        console_puts("   key received, code ");
+        console_put_uint((uint32_t)(uint8_t)uart_getc(USART2));
+        console_puts(": PASS\r\n");
     } else {
-        say("   no key within 5 seconds: SKIPPED\r\n");
+        console_puts("   no key within 5 seconds: SKIPPED\r\n");
     }
 
     /* Stage 3: bytes that arrive while nothing reads them must be counted as overruns. */
-    say("3) receive errors. In 2 seconds I will say GO. Then type 6 or more keys quickly.\r\n");
+    console_puts("3) receive errors. In 2 seconds I will say GO. Then type 6 or more keys quickly.\r\n");
     uart_clear_errors(USART2);
     delay_ms(2000);
-    say("   GO (nothing is echoed during this stage)\r\n");
+    console_puts("   GO (nothing is echoed during this stage)\r\n");
     delay_ms(3000);
     while (uart_data_available(USART2)) {
         (void)uart_getc(USART2);        /* this read is where the overrun gets counted */
     }
     uart_get_errors(USART2, &e);
-    say("   overrun "); say_uint(e.overrun);
-    say(", noise "); say_uint(e.noise);
-    say(", framing "); say_uint(e.framing);
-    say(e.overrun > 0U ? ": PASS, lost bytes were detected\r\n"
+    console_puts("   overrun "); console_put_uint(e.overrun);
+    console_puts(", noise "); console_put_uint(e.noise);
+    console_puts(", framing "); console_put_uint(e.framing);
+    console_puts(e.overrun > 0U ? ": PASS, lost bytes were detected\r\n"
                        : ": no overrun seen (type more keys, faster, or ignore this stage)\r\n");
 }

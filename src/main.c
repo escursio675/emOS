@@ -7,56 +7,9 @@
 #include "selftest.h"
 #include "../inc/memory.h"
 #include "interrupts.h"
+#include "shell/console.h"
+#include "shell/strutil.h"
 
-/* Small local string-equality helper -- avoids pulling in <string.h>
- * for a single comparison, matching this project's minimal-dependency
- * bare-metal style. */
-static int str_equals(const char *a, const char *b)
-{
-    while (*a != '\0' && *b != '\0') {
-        if (*a != *b) {
-            return 0;
-        }
-        a++;
-        b++;
-    }
-    return (*a == '\0' && *b == '\0');
-}
-
-static void say(const char *s)
-{
-    uart_puts(USART2, s);
-}
-
-static void say_uint(uint32_t v)
-{
-    char buf[11];            /* 10 digits + NUL */
-    uint32_t i = 10U;
-
-    buf[i] = '\0';
-    do {
-        i--;
-        buf[i] = (char)('0' + (v % 10U));
-        v /= 10U;
-    } while (v != 0U);
-
-    say(&buf[i]);
-}
-
-static void say_hex32(uint32_t v)
-{
-    static const char digits[] = "0123456789abcdef";
-    char buf[11];
-    int i;
-
-    buf[0] = '0';
-    buf[1] = 'x';
-    for (i = 0; i < 8; i++) {
-        buf[2 + i] = digits[(v >> (28 - 4 * i)) & 0xFU];
-    }
-    buf[10] = '\0';
-    say(buf);
-}
 
 /* mem: allocator statistics */
 static void cmd_mem(void)
@@ -65,12 +18,12 @@ static void cmd_mem(void)
 
     kmalloc_stats(&s);
 
-    say("Heap:\r\n");
-    say("  Total:        "); say_uint((uint32_t)s.total_bytes);  say("\r\n");
-    say("  Used:         "); say_uint((uint32_t)s.used_bytes);   say("\r\n");
-    say("  Free:         "); say_uint((uint32_t)s.free_bytes);   say("\r\n");
-    say("  Largest free: "); say_uint((uint32_t)s.largest_free); say("\r\n");
-    say("  Blocks:       "); say_uint((uint32_t)s.block_count);  say("\r\n");
+    console_puts("Heap:\r\n");
+    console_puts("  Total:        "); console_put_uint((uint32_t)s.total_bytes);  console_puts("\r\n");
+    console_puts("  Used:         "); console_put_uint((uint32_t)s.used_bytes);   console_puts("\r\n");
+    console_puts("  Free:         "); console_put_uint((uint32_t)s.free_bytes);   console_puts("\r\n");
+    console_puts("  Largest free: "); console_put_uint((uint32_t)s.largest_free); console_puts("\r\n");
+    console_puts("  Blocks:       "); console_put_uint((uint32_t)s.block_count);  console_puts("\r\n");
 }
 
 /* memtest: exercises kmalloc/kfree on the board. Temporary test command. */
@@ -81,23 +34,23 @@ static void cmd_memtest(void)
     void *c;
     void *big;
 
-    say("a = kmalloc(100): "); say_hex32((uint32_t)(uintptr_t)a); say("\r\n");
-    say("b = kmalloc(200): "); say_hex32((uint32_t)(uintptr_t)b); say("\r\n");
+    console_puts("a = kmalloc(100): "); console_put_hex32((uint32_t)(uintptr_t)a); console_puts("\r\n");
+    console_puts("b = kmalloc(200): "); console_put_hex32((uint32_t)(uintptr_t)b); console_puts("\r\n");
     cmd_mem();
 
     kfree(a);
     c = kmalloc(50);
-    say("kfree(a); c = kmalloc(50): "); say_hex32((uint32_t)(uintptr_t)c);
-    say(c == a ? " (reused a's block)\r\n" : " (different block)\r\n");
+    console_puts("kfree(a); c = kmalloc(50): "); console_put_hex32((uint32_t)(uintptr_t)c);
+    console_puts(c == a ? " (reused a's block)\r\n" : " (different block)\r\n");
 
     big = kmalloc(KHEAP_SIZE);
-    say("kmalloc(KHEAP_SIZE): ");
-    say(big == NULL ? "NULL (out of memory, as expected)\r\n" : "UNEXPECTED: succeeded\r\n");
+    console_puts("kmalloc(KHEAP_SIZE): ");
+    console_puts(big == NULL ? "NULL (out of memory, as expected)\r\n" : "UNEXPECTED: succeeded\r\n");
 
     kfree(b);
     kfree(c);
     kfree(big);              /* NULL is ignored */
-    say("freed everything\r\n");
+    console_puts("freed everything\r\n");
     cmd_mem();
 }
 
@@ -107,13 +60,13 @@ static void cmd_adc(void)
     uint16_t raw = adc_read(ADC_CHANNEL_0);
 
     if (raw == ADC_READ_ERROR) {
-        say("ADC read failed: no end-of-conversion\r\n");
+        console_puts("ADC read failed: no end-of-conversion\r\n");
         return;
     }
 
-    say("ADC A0 (PA0): raw "); say_uint(raw);
-    say(" of 4095, ");         say_uint(adc_to_millivolts(raw));
-    say(" mV\r\n");
+    console_puts("ADC A0 (PA0): raw "); console_put_uint(raw);
+    console_puts(" of 4095, ");         console_put_uint(adc_to_millivolts(raw));
+    console_puts(" mV\r\n");
 }
 
 /* adc vref: reads the chip's internal 1.21 V reference and estimates VDDA from it.
@@ -123,14 +76,14 @@ static void cmd_adc_vref(void)
     uint16_t raw = adc_read(ADC_CHANNEL_VREFINT);
 
     if (raw == ADC_READ_ERROR) {
-        say("ADC read failed: no end-of-conversion\r\n");
+        console_puts("ADC read failed: no end-of-conversion\r\n");
         return;
     }
 
-    say("VREFINT raw "); say_uint(raw);
-    say(" of 4095, estimated VDDA "); say_uint(adc_estimate_vdda_mv(raw));
-    say(" mV\r\n");
-    say("(expected: raw about 1450-1550, VDDA about 3200-3400 mV)\r\n");
+    console_puts("VREFINT raw "); console_put_uint(raw);
+    console_puts(" of 4095, estimated VDDA "); console_put_uint(adc_estimate_vdda_mv(raw));
+    console_puts(" mV\r\n");
+    console_puts("(expected: raw about 1450-1550, VDDA about 3200-3400 mV)\r\n");
 }
 
 int main(void)
@@ -151,6 +104,7 @@ int main(void)
     gpio_init_analog(GPIOA, 0);
 
     uart_init(USART2, 115200, 16000000);
+    console_init();
     systick_init(16000 - 1);  /* 1ms tick @ 16MHz HSI */
     kmalloc_init();
     adc_init();
@@ -159,33 +113,33 @@ int main(void)
     button_exti_init();
     irq_enable_global(); /* Ensure interrupts are unmasked */
 
-    uart_puts(USART2, "\r\n--- emOS Core Interrupts Booted ---\r\n");
-    uart_puts(USART2, "Commands:  led on | led off | led toggle | button | adc | adc vref | gpio test | uart test | stats | fault | mem | memtest\r\n");
-    uart_puts(USART2, "Press the Blue Button at any time to trigger an interrupt!\r\n");
+    console_puts("\r\n--- emOS Core Interrupts Booted ---\r\n");
+    console_puts("Commands:  led on | led off | led toggle | button | adc | adc vref | gpio test | uart test | stats | fault | mem | memtest\r\n");
+    console_puts("Press the Blue Button at any time to trigger an interrupt!\r\n");
 
     while (1) {
-        uart_puts(USART2, "\r\n> ");
-        uart_read_line(USART2, line_buf, sizeof(line_buf));
-        uart_puts(USART2, "\r\n");
+        console_puts("\r\n> ");
+        console_readline(line_buf, sizeof(line_buf));
+        console_puts("\r\n");
 
         if (str_equals(line_buf, "led on")) {
             gpio_write(GPIOA, 5, GPIO_PIN_HIGH);
-            uart_puts(USART2, "LED turned ON\r\n");
+            console_puts("LED turned ON\r\n");
         }
 
         else if (str_equals(line_buf, "led off")) {
             gpio_write(GPIOA, 5, GPIO_PIN_LOW);
-            uart_puts(USART2, "LED turned OFF\r\n");
+            console_puts("LED turned OFF\r\n");
         }
 
         else if (str_equals(line_buf, "led toggle")) {
             gpio_toggle(GPIOA, 5);
-            uart_puts(USART2, "LED toggled\r\n");
+            console_puts("LED toggled\r\n");
         } else if (str_equals(line_buf, "button")) {
             if (gpio_read(GPIOC, 13) == GPIO_PIN_LOW) {
-                uart_puts(USART2, "Button is PRESSED\r\n");
+                console_puts("Button is PRESSED\r\n");
             } else {
-                uart_puts(USART2, "Button is NOT pressed\r\n");
+                console_puts("Button is NOT pressed\r\n");
             }
         } else if (str_equals(line_buf, "mem")) {
             cmd_mem();
@@ -203,26 +157,18 @@ int main(void)
             /* Empty line (just pressed Enter) -- do nothing, reprint prompt. */
         } 
         else if (str_equals(line_buf, "stats")) {
-
-            /* basic integer printing to show the interrupt variable changing */
-
-            uart_puts(USART2, "Button interrupt trigger count: ");
-            char count_str[10];
-            int i = 0;
-            uint32_t temp = button_press_count;
-            if (temp == 0) count_str[i++] = '0';
-            while (temp > 0 && i < 9) { count_str[i++] = (temp % 10) + '0'; temp /= 10; }
-            while (i > 0) uart_putc(USART2, count_str[--i]);
-            uart_puts(USART2, "\r\n");
+            console_puts("Button interrupt trigger count: ");
+            console_put_uint(button_press_count);
+            console_puts("\r\n");
         }
 
         else if (str_equals(line_buf, "fault")) {
-            uart_puts(USART2, "Simulating HardFault via undefined instruction.....\r\n");
+            console_puts("Simulating HardFault via undefined instruction.....\r\n");
             __asm volatile("udf #0");   /* UsageFault -> escalates to HardFault */
         }
 
         else {
-            uart_puts(USART2, "Unknown command. Try: led on | led off | led toggle | button | adc | adc vref | gpio test | uart test | stats | fault | mem | memtest\r\n");
+            console_puts("Unknown command. Try: led on | led off | led toggle | button | adc | adc vref | gpio test | uart test | stats | fault | mem | memtest\r\n");
         }
     }
 

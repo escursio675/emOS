@@ -68,6 +68,9 @@ OBJS += $(SRC_DIR)/selftest.o
 OBJS += startup/startup.o
 OBJS += $(SRC_DIR)/memory.o
 OBJS += $(SRC_DIR)/hexdump.o
+OBJS += $(SRC_DIR)/shell/strutil.o
+OBJS += $(SRC_DIR)/shell/keyfilter.o
+OBJS += $(SRC_DIR)/shell/console.o
 
 ###############################################################################
 # C flags
