@@ -7,6 +7,7 @@
 #include "interrupts.h"
 #include "shell/console.h"
 #include "shell/shell.h"
+#include "commands/commands.h"     /* only for cmd_greet() */
 
 int main(void)
 {
@@ -33,13 +34,8 @@ int main(void)
     button_exti_init();
     irq_enable_global(); /* Ensure interrupts are unmasked */
 
-    /* Temporary banner. Phase 3 replaces it with the `greet` command and a
-     * hint to type `help`. The command list comes from the table, so it can
-     * never be out of date. */
-    console_puts("\r\n--- emOS Core Interrupts Booted ---\r\n");
-    console_puts("Commands:  ");
-    shell_print_commands();
-    console_puts("Press the Blue Button at any time to trigger an interrupt!\r\n");
+    /* Boot greeting (N2): banner + "Type 'help' ..." hint. */
+    (void)cmd_greet();
 
     shell_run();              /* never returns */
 

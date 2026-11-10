@@ -45,10 +45,9 @@ cmd_result_t shell_execute(char *line)
     console_puts(cmd);
     console_newline();
     if (str_has_space(cmd)) {
-        console_puts("Hint: type the command exactly as listed, with one space between words.\r\n");
+        console_puts("Hint: type the command exactly as shown by 'help', with one space between words.\r\n");
     }
-    console_puts("Available commands: ");
-    shell_print_commands();
+    console_puts("Type 'help' to see the available commands.\r\n");
     return CMD_FAIL;
 }
 

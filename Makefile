@@ -85,6 +85,13 @@ OBJS += $(SRC_DIR)/commands/cmd_adc.o
 OBJS += $(SRC_DIR)/commands/cmd_mem.o
 OBJS += $(SRC_DIR)/commands/cmd_selftest.o
 
+# --- Command handlers (Phase 3) ---
+OBJS += $(SRC_DIR)/commands/cmd_help.o
+OBJS += $(SRC_DIR)/commands/cmd_clear.o
+OBJS += $(SRC_DIR)/commands/cmd_greet.o
+OBJS += $(SRC_DIR)/commands/cmd_uptime.o
+OBJS += $(SRC_DIR)/commands/cmd_hexdump.o
+
 ###############################################################################
 # C flags
 

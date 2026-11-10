@@ -4,14 +4,29 @@
  * Prototypes of every shell command handler. Each handler prints its own
  * output over the console and returns CMD_OK or CMD_FAIL.
  *
- * Only cmd_table.c includes this header: it is the one file that needs to
- * know all the handlers.
+ * cmd_table.c includes this header because it must know every handler.
+ * main.c also includes it, but only to call cmd_greet() once at boot.
  */
 
 #ifndef COMMANDS_COMMANDS_H
 #define COMMANDS_COMMANDS_H
 
 #include "shell/shell.h"       /* cmd_result_t */
+
+/* cmd_help.c */
+cmd_result_t cmd_help(void);
+
+/* cmd_clear.c */
+cmd_result_t cmd_clear(void);
+
+/* cmd_greet.c  (also called once from main.c at boot: requirement N2) */
+cmd_result_t cmd_greet(void);
+
+/* cmd_uptime.c */
+cmd_result_t cmd_uptime(void);
+
+/* cmd_hexdump.c */
+cmd_result_t cmd_hexdump(void);
 
 /* cmd_led.c  (TEMPORARY: replaced by the `led` menu in Phase 5) */
 cmd_result_t cmd_led_on(void);
