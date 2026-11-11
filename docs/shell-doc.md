@@ -2,7 +2,6 @@
 
 **Target:** Nucleo-F401RE (STM32F401RE, Cortex-M4, 16 MHz). Bare-metal C, no HAL, no RTOS.
 **Console:** USART2, 115200 8N1, over the board's USB cable.
-**Not done:** the optional blinking cursor, skipped on purpose.
 
 ---
 
