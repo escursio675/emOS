@@ -103,3 +103,15 @@ void gpio_init_af(GPIO_TypeDef *port, uint8_t pin, uint8_t af)
     };
     gpio_init(port, pin, &cfg);
 }
+
+void gpio_init_analog(GPIO_TypeDef *port, uint8_t pin)
+{
+    gpio_config_t cfg = {
+        .mode  = GPIO_MODE_ANALOG,
+        .otype = GPIO_OTYPE_PUSH_PULL, /* ignored for ANALOG mode */
+        .speed = GPIO_SPEED_LOW,       /* ignored for ANALOG mode */
+        .pull  = GPIO_PULL_NONE,       /* a pull resistor would distort the measured voltage */
+        .af    = 0
+    };
+    gpio_init(port, pin, &cfg);
+}
