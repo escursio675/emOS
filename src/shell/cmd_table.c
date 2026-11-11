@@ -22,9 +22,10 @@ const shell_cmd_t shell_commands[] = {
     { "greet",      "Show the welcome banner",                        cmd_greet       },
     { "uptime",     "Time since boot",                                cmd_uptime      },
     { "hexdump",    "Dump memory (asks for address and length)",      cmd_hexdump     },
-    { "led on",     "Turn the LED on",                                cmd_led_on      },  /* TEMPORARY: `led` menu, Phase 5 */
-    { "led off",    "Turn the LED off",                               cmd_led_off     },  /* TEMPORARY: `led` menu, Phase 5 */
-    { "led toggle", "Flip the LED",                                   cmd_led_toggle  },  /* TEMPORARY: `led` menu, Phase 5 */
+    { "led on",     "LED on (pauses the status lights)",              cmd_led_on      },  /* TEMPORARY: `led` menu, Phase 5 */
+    { "led off",    "LED off (pauses the status lights)",             cmd_led_off     },  /* TEMPORARY: `led` menu, Phase 5 */
+    { "led toggle", "Flip the LED (pauses the status lights)",        cmd_led_toggle  },  /* TEMPORARY: `led` menu, Phase 5 */
+    { "led auto",   "Resume the status lights",                       cmd_led_auto    },  /* TEMPORARY: `led` menu, Phase 5 */
     { "button",     "Is the blue button pressed right now?",          cmd_button      },
     { "adc",        "Read A0: raw value and millivolts",              cmd_adc         },
     { "adc vref",   "Read the internal reference, estimate VDDA",     cmd_adc_vref    },  /* TEMPORARY: `vref`, Phase 7 */

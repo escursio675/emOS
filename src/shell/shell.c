@@ -3,13 +3,15 @@
  *
  * The shell core: prompt loop and command dispatcher.
  * Delivers requirements N1 (prompt), N3 (error on unknown command),
- * N4 (whitespace ignored) and N5 (never halts on bad input).
+ * N4 (whitespace ignored), N5 (never halts on bad input) and, with
+ * status_led, F7 (status lights).
  */
 
 #include <stddef.h>
 #include "shell/shell.h"
 #include "shell/console.h"
 #include "shell/strutil.h"
+#include "status_led.h"
 
 void shell_print_commands(void)
 {
@@ -36,11 +38,16 @@ cmd_result_t shell_execute(char *line)
 
     for (i = 0U; i < shell_command_count; i++) {
         if (str_equals(cmd, shell_commands[i].name)) {
-            return shell_commands[i].run();
+            cmd_result_t r;
+
+            status_led_set(STATUS_BUSY);              /* solid on while it runs */
+            r = shell_commands[i].run();
+            status_led_signal((r == CMD_OK) ? STATUS_OK : STATUS_ERROR);
+            return r;
         }
     }
 
-    /* N3: not in the table. Say so, show what is available, keep running. */
+    /* N3: not in the table. Say so, point at help, keep running. */
     console_puts("Unknown command: ");
     console_puts(cmd);
     console_newline();
@@ -48,6 +55,7 @@ cmd_result_t shell_execute(char *line)
         console_puts("Hint: type the command exactly as shown by 'help', with one space between words.\r\n");
     }
     console_puts("Type 'help' to see the available commands.\r\n");
+    status_led_signal(STATUS_ERROR);
     return CMD_FAIL;
 }
 

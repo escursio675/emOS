@@ -32,6 +32,7 @@ cmd_result_t cmd_hexdump(void);
 cmd_result_t cmd_led_on(void);
 cmd_result_t cmd_led_off(void);
 cmd_result_t cmd_led_toggle(void);
+cmd_result_t cmd_led_auto(void);       /* gives LD2 back to the status lights */
 
 /* cmd_system.c */
 cmd_result_t cmd_button(void);

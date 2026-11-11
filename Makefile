@@ -92,6 +92,9 @@ OBJS += $(SRC_DIR)/commands/cmd_greet.o
 OBJS += $(SRC_DIR)/commands/cmd_uptime.o
 OBJS += $(SRC_DIR)/commands/cmd_hexdump.o
 
+# --- Status LED (Phase 4) ---
+OBJS += $(SRC_DIR)/status_led.o
+
 ###############################################################################
 # C flags
 
