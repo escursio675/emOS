@@ -1,7 +1,8 @@
 /**
  * cmd_adc.c
  *
- * ADC commands: `adc` and `adc vref`.
+ * ADC commands: `adc` and `vref`.
+ * (`vref` was the two-word command `adc vref` until Phase 7.)
  */
 
 #include "commands/commands.h"
@@ -24,9 +25,9 @@ cmd_result_t cmd_adc(void)
     return CMD_OK;
 }
 
-/* adc vref: reads the chip's internal 1.21 V reference and estimates VDDA from it.
+/* vref: reads the chip's internal 1.21 V reference and estimates VDDA from it.
  * Needs no wiring, so it checks the whole conversion path on its own. */
-cmd_result_t cmd_adc_vref(void)
+cmd_result_t cmd_vref(void)
 {
     uint16_t raw = adc_read(ADC_CHANNEL_VREFINT);
 

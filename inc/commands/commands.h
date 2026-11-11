@@ -38,17 +38,21 @@ cmd_result_t cmd_fault(void);
 /* cmd_irq.c  (the `irq` menu: interrupt demo, requirement F8) */
 cmd_result_t cmd_irq(void);
 
-
 /* cmd_adc.c */
 cmd_result_t cmd_adc(void);
-cmd_result_t cmd_adc_vref(void);       /* renamed `vref` in Phase 7 */
+cmd_result_t cmd_vref(void);
 
 /* cmd_mem.c */
 cmd_result_t cmd_mem(void);
 cmd_result_t cmd_memtest(void);
 
-/* cmd_selftest.c  (TEMPORARY: merged into the `selftest` menu in Phase 7) */
-cmd_result_t cmd_gpio_test(void);
-cmd_result_t cmd_uart_test(void);
+/* cmd_selftest.c  (the `selftest` menu: GPIO, UART) */
+cmd_result_t cmd_selftest(void);
+
+/* cmd_version.c */
+cmd_result_t cmd_version(void);
+
+/* cmd_reboot.c */
+cmd_result_t cmd_reboot(void);
 
 #endif /* COMMANDS_COMMANDS_H */
