@@ -1,19 +1,20 @@
 /**
  * cmd_system.c
  *
- * Small system commands: `button`, `stats`, `fault`.
+ * Small system commands: `button`, `fault`.
+ * (`stats` was folded into the `irq` menu in Phase 6.)
  */
 
 #include "commands/commands.h"
 #include "shell/console.h"
 #include "gpio.h"
-#include "interrupts.h"
 
 /* B1 user button is wired to PC13 (HIGH when released, LOW when pressed). */
 #define BUTTON_PORT  GPIOC
 #define BUTTON_PIN   13U
 
-/* button: polls the button level right now (compare with the interrupt counter in `stats`). */
+/* button: polls the button level right now (compare with the interrupt counter
+ * in the `irq` menu, option 1). */
 cmd_result_t cmd_button(void)
 {
     if (gpio_read(BUTTON_PORT, BUTTON_PIN) == GPIO_PIN_LOW) {
@@ -21,16 +22,6 @@ cmd_result_t cmd_button(void)
     } else {
         console_puts("Button is NOT pressed\r\n");
     }
-    return CMD_OK;
-}
-
-/* stats: how many times the button interrupt has fired.
- * TEMPORARY: becomes part of the `irq` menu in Phase 6. */
-cmd_result_t cmd_stats(void)
-{
-    console_puts("Button interrupt trigger count: ");
-    console_put_uint(button_press_count);
-    console_puts("\r\n");
     return CMD_OK;
 }
 

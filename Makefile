@@ -98,6 +98,9 @@ OBJS += $(SRC_DIR)/status_led.o
 # --- Shell menu helper (Phase 5) ---
 OBJS += $(SRC_DIR)/shell/menu.o
 
+# --- Interrupt demo (Phase 6) ---
+OBJS += $(SRC_DIR)/commands/cmd_irq.o
+
 ###############################################################################
 # C flags
 

@@ -33,8 +33,11 @@ cmd_result_t cmd_led(void);
 
 /* cmd_system.c */
 cmd_result_t cmd_button(void);
-cmd_result_t cmd_stats(void);          /* TEMPORARY: folded into the `irq` menu in Phase 6 */
 cmd_result_t cmd_fault(void);
+
+/* cmd_irq.c  (the `irq` menu: interrupt demo, requirement F8) */
+cmd_result_t cmd_irq(void);
+
 
 /* cmd_adc.c */
 cmd_result_t cmd_adc(void);
