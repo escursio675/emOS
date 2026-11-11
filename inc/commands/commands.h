@@ -19,7 +19,7 @@ cmd_result_t cmd_help(void);
 /* cmd_clear.c */
 cmd_result_t cmd_clear(void);
 
-/* cmd_greet.c  (also called once from main.c at boot: requirement N2) */
+/* cmd_greet.c  (also called once from main.c at boot) */
 cmd_result_t cmd_greet(void);
 
 /* cmd_uptime.c */
@@ -28,26 +28,31 @@ cmd_result_t cmd_uptime(void);
 /* cmd_hexdump.c */
 cmd_result_t cmd_hexdump(void);
 
-/* cmd_led.c  (TEMPORARY: replaced by the `led` menu in Phase 5) */
-cmd_result_t cmd_led_on(void);
-cmd_result_t cmd_led_off(void);
-cmd_result_t cmd_led_toggle(void);
+/* cmd_led.c  (the `led` menu: on, off, toggle, blinky) */
+cmd_result_t cmd_led(void);
 
 /* cmd_system.c */
 cmd_result_t cmd_button(void);
-cmd_result_t cmd_stats(void);          /* TEMPORARY: folded into the `irq` menu in Phase 6 */
 cmd_result_t cmd_fault(void);
+
+/* cmd_irq.c  (the `irq` menu: interrupt demo) */
+cmd_result_t cmd_irq(void);
 
 /* cmd_adc.c */
 cmd_result_t cmd_adc(void);
-cmd_result_t cmd_adc_vref(void);       /* renamed `vref` in Phase 7 */
+cmd_result_t cmd_vref(void);
 
 /* cmd_mem.c */
 cmd_result_t cmd_mem(void);
 cmd_result_t cmd_memtest(void);
 
-/* cmd_selftest.c  (TEMPORARY: merged into the `selftest` menu in Phase 7) */
-cmd_result_t cmd_gpio_test(void);
-cmd_result_t cmd_uart_test(void);
+/* cmd_selftest.c  (the `selftest` menu: GPIO, UART) */
+cmd_result_t cmd_selftest(void);
+
+/* cmd_version.c */
+cmd_result_t cmd_version(void);
+
+/* cmd_reboot.c */
+cmd_result_t cmd_reboot(void);
 
 #endif /* COMMANDS_COMMANDS_H */

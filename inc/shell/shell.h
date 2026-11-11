@@ -6,8 +6,8 @@
  *
  * A command is one row of the table in cmd_table.c:
  *     { name, summary, handler }
- * The dispatcher, the banner and (from Phase 3) `help` all read that one
- * table, so adding a command never touches the dispatcher.
+ * The dispatcher and `help` both read that one table, so adding a command
+ * never touches the dispatcher.
  */
 
 #ifndef SHELL_SHELL_H
@@ -15,7 +15,7 @@
 
 #include <stddef.h>
 
-/* The prompt printed before every input line (requirement N1).
+/* The prompt printed before every input line.
  * Change it here and nowhere else. */
 #define SHELL_PROMPT     "> "
 
@@ -34,7 +34,7 @@ typedef cmd_result_t (*cmd_fn_t)(void);
 
 typedef struct {
     const char *name;       /* what the user types; lower case, no leading/trailing space */
-    const char *summary;    /* one-line description (used by `help` from Phase 3) */
+    const char *summary;    /* one-line description, shown by `help` */
     cmd_fn_t    run;        /* the handler */
 } shell_cmd_t;
 
@@ -50,7 +50,7 @@ void shell_print_commands(void);
  * Works IN PLACE on `line` (str_trim modifies the buffer).
  * - blank or whitespace-only line: prints nothing, returns CMD_OK
  * - known command: returns whatever the handler returns
- * - unknown command: prints an error and the command list, returns CMD_FAIL */
+ * - unknown command: prints an error and a pointer to `help`, returns CMD_FAIL */
 cmd_result_t shell_execute(char *line);
 
 /* The main loop: print prompt, read a line, execute it, repeat. Never returns. */

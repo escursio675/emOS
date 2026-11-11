@@ -5,3 +5,5 @@
 *.hex
 *.map
 .DS_Store
+emOS.resc
+stm32f401re.repl

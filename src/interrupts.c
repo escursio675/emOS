@@ -7,7 +7,7 @@
 #include "interrupts.h"
 #include "stm32f401re.h"
 #include "uart.h"
-#include "gpio.h"
+#include "status_led.h"
 
 volatile uint32_t button_press_count = 0;
 
@@ -67,8 +67,10 @@ void exti15_10_irqhandler(void) {
         /* clears the pending flag by writing a 1! */
         EXTI->PR = (1UL << 13);
 
-        /* ACTION: toggle the LED and increment count */
-        gpio_toggle(GPIOA, 5);
+        /* ACTION: count the press and nothing else. The visible effect (an LED
+         * flash) is produced in normal context by the idle hook in main.c.
+         * button_press_count is a single 32-bit volatile: one write here, one
+         * read there, no lock needed. */
         button_press_count++;
     }
 }
@@ -86,9 +88,7 @@ void hardfault_handler(void) {
     uart_puts(USART2, "===================================\r\n");
     uart_puts(USART2, "System Halted.\r\n");
 
-    while (1) {
-        // halt
-    }
+    status_led_fault_forever();     /* fast blink, never returns */
 }
 
 /* overrides the weak alias in startup.c */
