@@ -4,5 +4,6 @@
 *.bin
 *.hex
 *.map
-.DS_StoreemOS.resc
+.DS_Store
+emOS.resc
 stm32f401re.repl
