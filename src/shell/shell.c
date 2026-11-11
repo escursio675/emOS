@@ -2,9 +2,11 @@
  * shell.c
  *
  * The shell core: prompt loop and command dispatcher.
- * Delivers requirements N1 (prompt), N3 (error on unknown command),
- * N4 (whitespace ignored), N5 (never halts on bad input) and, with
- * status_led, F7 (status lights).
+ *
+ * Prints the prompt, reads a line, runs the matching command and reports an
+ * unknown command without stopping. Leading and trailing blanks are ignored.
+ * While a command runs the status LED is solid on; afterwards it flashes the
+ * OK or ERROR pattern.
  */
 
 #include <stddef.h>
@@ -28,7 +30,7 @@ void shell_print_commands(void)
 
 cmd_result_t shell_execute(char *line)
 {
-    char  *cmd = str_trim(line);          /* N4: strip leading/trailing blanks */
+    char  *cmd = str_trim(line);          /* strip leading and trailing blanks */
     size_t i;
 
     /* A blank line is not an error: just give the user a new prompt. */
@@ -47,7 +49,7 @@ cmd_result_t shell_execute(char *line)
         }
     }
 
-    /* N3: not in the table. Say so, point at help, keep running. */
+    /* Not in the table: say so, point at help, keep running. */
     console_puts("Unknown command: ");
     console_puts(cmd);
     console_newline();

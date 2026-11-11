@@ -6,8 +6,7 @@
  * menu_run() prints the rows, waits for ONE key (no Enter needed), runs the
  * matching action and asks again, until the user presses q.
  *
- * Used by the `led` command (Phase 5); the `irq` (Phase 6) and `selftest`
- * (Phase 7) commands will use it too.
+ * Used by the `led`, `irq` and `selftest` commands.
  */
 
 #ifndef SHELL_MENU_H

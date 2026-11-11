@@ -2,7 +2,6 @@
  * cmd_adc.c
  *
  * ADC commands: `adc` and `vref`.
- * (`vref` was the two-word command `adc vref` until Phase 7.)
  */
 
 #include "commands/commands.h"

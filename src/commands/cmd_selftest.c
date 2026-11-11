@@ -2,14 +2,13 @@
  * cmd_selftest.c
  *
  * `selftest`: a small menu over the two driver self-tests in selftest.c.
- * (It replaces the two-word commands `gpio test` and `uart test`, Phase 7.)
  *
  *     1) GPIO   2) UART   q) Quit
  *
  * selftest_gpio() and selftest_uart() print their own PASS/FAIL lines and
- * return nothing, so the actions always report CMD_OK. (If you later want the
- * status LED to flash red on a failed self-test, change those two functions
- * to return a result first.)
+ * return nothing, so the actions always report CMD_OK and the status LED
+ * always shows success. To show the error pattern for a failed self-test,
+ * change those two functions to return a result.
  */
 
 #include <stddef.h>

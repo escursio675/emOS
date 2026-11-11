@@ -3,10 +3,9 @@
  *
  * THE table of shell commands. This is the only file that knows the full
  * list. To add a command: write the handler, declare it in commands.h, add
- * one row here, add one OBJS line to the Makefile, and add the name to
- * tests/host/test_table.c.
+ * one row here, and add one OBJS line to the Makefile.
  *
- * Rules for `name` (requirement N8, checked by tests/host/test_table.c):
+ * Rules for `name`:
  *   - ONE word: lower case letters and digits only, starting with a letter
  *   - exactly what the user types (the match is case-sensitive)
  */

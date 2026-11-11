@@ -1,8 +1,8 @@
 /**
  * cmd_greet.c
  *
- * `greet`: prints the welcome banner and a hint to use `help`
- * (requirements F2 and N2). main.c calls it once at boot.
+ * `greet`: prints the welcome banner and a hint to use `help`.
+ * main.c also calls it once at boot.
  */
 
 #include "commands/commands.h"

@@ -59,7 +59,7 @@ int main(void)
     status_led_init();
     console_set_idle_hook(idle_hook);
 
-    /* Boot greeting (N2): banner + "Type 'help' ..." hint. */
+    /* Boot greeting: banner + "Type 'help' ..." hint. */
     (void)cmd_greet();
 
     shell_run();              /* never returns */

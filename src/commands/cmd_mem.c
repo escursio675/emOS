@@ -26,7 +26,7 @@ cmd_result_t cmd_mem(void)
     return CMD_OK;
 }
 
-/* memtest: exercises kmalloc/kfree on the board. Temporary test command.
+/* memtest: exercises kmalloc/kfree on the board.
  * Returns CMD_FAIL only if the "must fail" allocation unexpectedly succeeds. */
 cmd_result_t cmd_memtest(void)
 {

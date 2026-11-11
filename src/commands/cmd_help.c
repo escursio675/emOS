@@ -1,8 +1,8 @@
 /**
  * cmd_help.c
  *
- * `help`: lists every command in the table with its one-line summary
- * (requirement F3). It reads shell_commands[], so it can never be out of date.
+ * `help`: lists every command in the table with its one-line summary.
+ * It reads shell_commands[], so it can never be out of date.
  */
 
 #include <stddef.h>
@@ -12,7 +12,7 @@
 #include "shell/shell.h"
 
 /* Column where the summary starts (measured from the start of the name).
- * The longest name today is "led toggle" (10). Names that are longer than
+ * The longest name today is "selftest" (8). Names that are longer than
  * this still work: they just get one space before the summary. */
 #define HELP_NAME_WIDTH  12U
 

@@ -1,7 +1,7 @@
 /**
  * cmd_irq.c
  *
- * `irq`: the interrupt demo menu (requirement F8).
+ * `irq`: the interrupt demo menu.
  *
  *     1) Status   2) Trigger   3) Wait for button   4) Mask/Unmask
  *     5) Reset counter   q) Quit
@@ -34,7 +34,7 @@
 #define IRQ_TRIGGER_WAIT_MS  10U      /* how long Trigger waits for the ISR       */
 #define IRQ_SETTLE_MS        2U       /* pause so a just-unmasked ISR can finish  */
 
-/* Sleep until the next interrupt. The host test replaces this macro. */
+/* Sleep until the next interrupt. Can be overridden at compile time. */
 #ifndef IRQ_WFI
 #define IRQ_WFI()  __asm volatile("wfi" : : : "memory")
 #endif

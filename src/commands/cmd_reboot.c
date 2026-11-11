@@ -8,8 +8,9 @@
  * of "Rebooting..." has left the UART (TC flag), with a loop limit so a broken
  * UART cannot hang the command.
  *
- * The three REBOOT_* macros exist so the host test can replace the hardware
- * parts; on the board the defaults below are used.
+ * The three REBOOT_* macros wrap the hardware parts (TX-complete check,
+ * barrier, halt loop) and can be overridden at compile time. On the board the
+ * defaults below are used.
  */
 
 #include <stdint.h>

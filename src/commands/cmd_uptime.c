@@ -1,7 +1,7 @@
 /**
  * cmd_uptime.c
  *
- * `uptime`: time since boot, e.g. "Uptime: 0h 03m 12s (192 s)" (requirement F5).
+* `uptime`: time since boot, e.g. "Uptime: 0h 03m 12s (192 s)".
  *
  * uptime_ms() is a 32-bit millisecond counter, so it wraps after about
  * 49.7 days; `uptime` then starts again from 0.

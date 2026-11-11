@@ -49,7 +49,7 @@ led_status_t status_led_get(void);
  * Does nothing while BUSY (solid) or while the LED is acquired. */
 void status_led_update(void);
 
-/* ---- manual control (used by the led commands, later the led menu) ---- */
+/* ---- manual control (used by the `led` menu) ---- */
 
 /* Takes manual control: patterns freeze. The first call turns the LED off;
  * calling it again while already acquired changes nothing. */

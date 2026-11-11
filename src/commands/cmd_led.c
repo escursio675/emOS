@@ -1,11 +1,11 @@
 /**
  * cmd_led.c
  *
- * `led`: opens the LED menu (requirement F6).
+ * `led`: opens the LED menu.
  *
  *     1) On   2) Off   3) Toggle   4) Blinky   q) Quit
  *
- * The status LED (Phase 4) owns PA5. This file never touches the pin: it
+ * The status LED owns PA5. This file never touches the pin: it
  * takes manual control with status_led_acquire(), changes the LED through
  * status_led_manual_*(), and gives control back with status_led_release().
  */

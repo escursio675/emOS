@@ -19,7 +19,7 @@ cmd_result_t cmd_help(void);
 /* cmd_clear.c */
 cmd_result_t cmd_clear(void);
 
-/* cmd_greet.c  (also called once from main.c at boot: requirement N2) */
+/* cmd_greet.c  (also called once from main.c at boot) */
 cmd_result_t cmd_greet(void);
 
 /* cmd_uptime.c */
@@ -35,7 +35,7 @@ cmd_result_t cmd_led(void);
 cmd_result_t cmd_button(void);
 cmd_result_t cmd_fault(void);
 
-/* cmd_irq.c  (the `irq` menu: interrupt demo, requirement F8) */
+/* cmd_irq.c  (the `irq` menu: interrupt demo) */
 cmd_result_t cmd_irq(void);
 
 /* cmd_adc.c */

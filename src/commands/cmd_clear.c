@@ -1,7 +1,7 @@
 /**
  * cmd_clear.c
  *
- * `clear`: wipes the terminal screen (requirement F1).
+ * `clear`: wipes the terminal screen.
  */
 
 #include "commands/commands.h"

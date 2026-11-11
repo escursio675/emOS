@@ -2,7 +2,7 @@
  * cmd_hexdump.c
  *
  * `hexdump`: asks for an address and a length (Enter = defaults), checks that
- * the range is safe to read, then prints a hex + ASCII dump (requirement F4).
+ * the range is safe to read, then prints a hex + ASCII dump.
  *
  * The formatting and the range check live in hexdump.c; this file only
  * handles the dialogue with the user.
@@ -59,7 +59,7 @@ cmd_result_t cmd_hexdump(void)
         return CMD_FAIL;
     }
 
-    /* 3. Safety: flash and SRAM only. Do NOT loosen this check. */
+    /* 3. Safety: flash and SRAM only. A read anywhere else can fault. */
     if (!hexdump_range_valid(addr, len)) {
         console_puts("Invalid range. Allowed: flash 0x08000000-0x0807FFFF, "
                      "SRAM 0x20000000-0x20017FFF.\r\n");

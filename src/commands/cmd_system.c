@@ -2,7 +2,6 @@
  * cmd_system.c
  *
  * Small system commands: `button`, `fault`.
- * (`stats` was folded into the `irq` menu in Phase 6.)
  */
 
 #include "commands/commands.h"
