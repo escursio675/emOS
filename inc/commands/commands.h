@@ -28,11 +28,8 @@ cmd_result_t cmd_uptime(void);
 /* cmd_hexdump.c */
 cmd_result_t cmd_hexdump(void);
 
-/* cmd_led.c  (TEMPORARY: replaced by the `led` menu in Phase 5) */
-cmd_result_t cmd_led_on(void);
-cmd_result_t cmd_led_off(void);
-cmd_result_t cmd_led_toggle(void);
-cmd_result_t cmd_led_auto(void);       /* gives LD2 back to the status lights */
+/* cmd_led.c  (the `led` menu: on, off, toggle, blinky) */
+cmd_result_t cmd_led(void);
 
 /* cmd_system.c */
 cmd_result_t cmd_button(void);

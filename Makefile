@@ -95,6 +95,9 @@ OBJS += $(SRC_DIR)/commands/cmd_hexdump.o
 # --- Status LED (Phase 4) ---
 OBJS += $(SRC_DIR)/status_led.o
 
+# --- Shell menu helper (Phase 5) ---
+OBJS += $(SRC_DIR)/shell/menu.o
+
 ###############################################################################
 # C flags
 
